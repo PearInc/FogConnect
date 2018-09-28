@@ -18,6 +18,9 @@ FogConnet 是用于P2P网络中连接，调度，传输等功能于一体的组�
 10. 对资源消耗极少（一般运行状态下内存占用3～5M,峰值不超过50M）。
 11. API简单，易懂，支持多种方式接入。
 
+### 第三方协议无缝连接
+![third part connect](doc/images/third_part_connect.png)
+
 ## 快速开始
 - 阅读[编译步骤](doc/getting_started.md)了解如何开始使用.
 
@@ -123,3 +126,9 @@ int main() {
 - [FogConnet协议栈](doc/PTP-Connect协议栈.md)
 
 
+## 开发者简介
+- 吴必磊(w@pear.hk)
+    - 知名数据恢复软件Any Data Recovery Pro作者、反汇编与破解专家（同时也是不知名的健身教练）7年以上产品开发经验的首席技术负责人。
+
+- 陈荡漾(66@pear.hk)
+    
