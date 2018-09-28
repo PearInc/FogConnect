@@ -1,15 +1,5 @@
 # PTP-Connect
 
-## 协议栈
-
-- FogConnet协议栈如下：
-![FogConnetStack.png](images/fogconnectstack.png)
-
-
-## 接入 FogConnet 后的流程图如下：
-- ![flowchart.png](images/fogconnect-flowchart.png)
-
-
 ## 以下为 API 使用说明:
 - 根据上面的流程图，可以知道接入时就是重写几个回调函数，实际上是3个回调2个操作1个保存,具体回调函数和操作说明如下：
 
