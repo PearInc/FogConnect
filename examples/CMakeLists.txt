@@ -8,7 +8,10 @@ set(CMAKE_C_FLAGS "-O0 -ggdb ")
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(/usr/include/glib-2.0)
 
+
 add_subdirectory(echo/)
+add_subdirectory(filetransfer/)
+
 
 add_library(fog_connection pr_fog_connect.c)
 target_link_libraries(fog_connection 

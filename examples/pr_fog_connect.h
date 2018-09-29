@@ -39,6 +39,7 @@ typedef struct pr_usr_data_s {
     pear_msg_callback_cb_p msgcb;
     pear_close_cb_p closecb;
 
+    void* context;
     struct evbuffer* buff;
 } pr_usr_data_t;
 
