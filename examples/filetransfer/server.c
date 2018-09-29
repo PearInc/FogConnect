@@ -15,7 +15,7 @@ const char* g_file = NULL;
 
 GString* read_file(const char* filename)
 {
-    GString* content = g_string_new("");
+    GString* content = g_string_new(NULL);
     FILE* fp = fopen(filename, "rb");
     if (fp) {
         const int kBufSize = 1024*1024;
@@ -26,9 +26,7 @@ GString* read_file(const char* filename)
         char string_buf[kBufSize];
         size_t nread = 0;
         while((nread = fread(buf, 1, sizeof(buf), fp)) > 0) {
-            memcpy(string_buf, buf, nread);
-            string_buf[nread] = 0;
-            g_string_append(content, string_buf);
+            g_string_append_len(content, buf, nread);
         }
         fclose(fp);
     }

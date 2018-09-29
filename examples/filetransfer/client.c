@@ -53,6 +53,7 @@ void msg_cb(void* arg)
         char* msg = g_new(char, length);
         evbuffer_remove(ud->buff, msg, length);
         g_string_append_len(f->file_content, msg, length);
+        printf("total rece length %ld\n", f->file_content->len);
         free(msg);
         if (f->file_content->len == f->size) {
             // write it to the file
