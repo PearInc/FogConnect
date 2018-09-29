@@ -27,9 +27,8 @@ void msg_cb(void* arg)
     }
 }
 
-void close_cb(void* pr_connect, void* arg)
+void close_cb(void* arg)
 {
-    pear_usr_data_free(arg);
 }
 
 int main()

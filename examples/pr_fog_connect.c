@@ -19,7 +19,8 @@ static void pear_msg_cb(void* pr_connect, void* arg, void* buf, int size)
 static void pear_close_cb(void* connect, void* arg)
 {
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
-    ud->closecb(connect, ud);
+    ud->closecb(ud);
+    pear_usr_data_free(ud);
 }
 
 
@@ -116,5 +117,5 @@ void pear_fogconnect_set_callback(pear_connecting_callback_cb_p cb, pear_connect
 
 int pear_connect_peer(const char* id)
 {
-    return pr_connect_peer(ctx, id, PR_TRANSPORT_PROTOCOL_QUIC, 1, pear_callbacks, usr_data);
+    return pr_connect_peer(ctx, id, TRANSPORT_PROTOCOL, 1, pear_callbacks, usr_data);
 }

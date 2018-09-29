@@ -10,7 +10,7 @@
 void connecting_cb(void* arg)
 {
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
-    char* msg = g_strdup("jys\r\n");
+    char* msg = g_strdup("hello\r\n");
     pr_send_peer(ud->pr_connect, msg, strlen(msg));
     free(msg);
 }
@@ -27,9 +27,9 @@ void msg_cb(void* arg)
     }
 }
 
-void close_cb(void* pr_connect, void* arg)
+void close_cb(void* arg)
 {
-    pear_usr_data_free(arg);
+    // call this function when the connection is closed
 }
 
 int main()

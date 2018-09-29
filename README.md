@@ -6,21 +6,70 @@ FogConnet 是用于P2P网络中连接，调度，传输等功能于一体的组�
 ![fog_connectstack](./doc/images/fogconnectstack.png)
 
 ### 特性
-1. 支持多种传输控制协议(QUIC,RTC,KCP,uTP,SCTP等等)。
-2. 探测NAT类型，并收集和维护用于P2P连接的IP：PORT列表。
-3. 支持双向“打洞”和高级端口预测。
-4. NAT类型最优匹配组合策略。
-5. 连接控制与物理距离最近原则。
-6. UDP协议作为传输层。
-7. 支持多种传输控制协议(QUIC, RTC, KCP, uTP, SCTP等等)。
-8. 具有中继功能。
-9. 所有网络信号采用事件机制处理。
-10. 对资源消耗极少（一般运行状态下内存占用3～5M,峰值不超过50M）。
-11. API简单，易懂，支持多种方式接入。
+- 支持多种传输控制协议(QUIC,RTC,KCP,uTP,SCTP等)。
+- 探测NAT类型，并收集和维护用于P2P连接的IP：PORT列表。
+- 支持双向“打洞”和高级端口预测。 lianjielvgenggao
+- NAT类型最优匹配组合策略。
+- 连接控制与物理距离最近原则。
+- 具有中继功能。
+- 所有网络信号采用事件机制处理。
+- 对资源消耗极少（一般运行状态下内存占用3～5M,峰值不超过50M）。
+- API简单，易懂，支持多种方式接入。
 
 
 ## 快速开始
-- 阅读[编译步骤](doc/getting_started.md)了解如何开始使用.
+FogConnect depends on following packages:
+- [openssl](https://www.cnblogs.com/emanlee/p/6100019.html)
+- [libwebsockets.so.10](https://libwebsockets.org/)
+- [libjansson.so.4](https://github.com/akheron/jansson)
+- [libusrsctp.so.1](https://github.com/sctplab/usrsctp)
+- [libevent-2.0.so.5](https://github.com/libevent/libevent)
+- [libglib-2.0.so.0](https://github.com/GNOME/glib)
+
+
+## Supported Environment
+- Ubuntu/Linuxmint
+
+
+### Ubuntu/LinuxMint
+
+#### Prepare deps
+Install common deps:
+
+``` shell
+sudo apt-get install git g++ make 
+```
+
+Install dependencies:
+
+``` shell
+sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev ibevent-dev libglib2.0-dev 
+```
+
+Install libusrsctp:
+``` shell
+git clone https://github.com/sctplab/usrsctp.git
+cd usrsctp/
+cmake .
+make
+sudo cp usrsctplib/libusrsctp.so* /usr/lib/x86_64-linux-gnu/
+sudo cp usrsctplib/libusrsctp.a /usr/lib/x86_64-linux-gnu/
+```
+#### Compile FogConnect
+##### Prepare the FogConnect env
+``` shell
+git clone git@github.com:PearInc/FogConnect.git
+cd FogConnect
+sudo cp include/fogconnect.h /usr/include/
+sudo cp x86/linux/64/libfog* /usr/lib/x86_64-linux-gnu/
+```
+
+##### Build and run examples
+``` shell
+make
+./x86/linux/64/test_server && ./x86/linux/64/test_client
+```
+This example default use the QUIC protocol
 
 ## 性能测试
 
@@ -88,7 +137,7 @@ int main() {
 
 void connecting_cb(void* arg) {
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
-    char* msg = g_strdup("jys\r\n");
+    char* msg = g_strdup("Hello\r\n");
     pr_send_peer(ud->pr_connect, msg, strlen(msg));
     free(msg);
 }
@@ -104,8 +153,8 @@ void msg_cb(void* arg) {
     }
 }
 
-void close_cb(void* pr_connect, void* arg) {
-    pear_usr_data_free(arg);
+void close_cb(void* arg) {
+    // call this method when the connection is closed
 }
 
 int main() {

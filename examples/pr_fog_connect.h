@@ -13,7 +13,7 @@
 #include "fogconnect.h"
 
 #define SIGNAL_SERVER_URL "47.52.153.245"
-
+#define TRANSPORT_PROTOCOL PR_TRANSPORT_PROTOCOL_QUIC
 
 #define SETUP(id, concb, msgcb, closecb)  \
 do {    \
@@ -29,7 +29,7 @@ typedef void (*pear_connecting_cb_p)(void* arg);
 
 typedef void (*pear_msg_callback_cb_p)(void* arg);
 
-typedef void (*pear_close_cb_p)(void* pr_connect, void* arg);
+typedef void (*pear_close_cb_p)(void* arg);
 
 
 typedef struct pr_usr_data_s {
