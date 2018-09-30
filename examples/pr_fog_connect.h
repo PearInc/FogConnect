@@ -13,7 +13,7 @@
 #include "fogconnect.h"
 
 #define SIGNAL_SERVER_URL "47.52.153.245"
-#define TRANSPORT_PROTOCOL PR_TRANSPORT_PROTOCOL_UDP
+#define TRANSPORT_PROTOCOL PR_TRANSPORT_PROTOCOL_KCP
 
 #define SETUP(id, concb, msgcb, closecb)  \
 do {    \
