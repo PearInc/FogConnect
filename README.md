@@ -114,7 +114,7 @@ int main() {
     for (int i = 0; i < 100; i++) {
         sleep(2);
     }
-    pear_fog_connect_release();
+    pear_connect_release();
     return 0;
 }
 ```
@@ -151,7 +151,7 @@ int main() {
     for (int i=0;i<100;i++) {
         sleep(2);
     }
-    pear_fog_connect_release();
+    pear_connect_release();
     return 0;
 }
 ```

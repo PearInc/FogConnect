@@ -52,7 +52,7 @@ int main()
         sleep(2);
     }
 
-    pear_fog_connect_release();
+    pear_connect_release();
 
     return 0;
 }

@@ -220,7 +220,7 @@ int main()
     event_add(timer, &tv);
     event_base_dispatch(base);
 
-    pear_fog_connect_release();
+    pear_connect_release();
     return 0;
 }
 

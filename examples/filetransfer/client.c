@@ -1,5 +1,3 @@
-
-#include <glib.h>
 #include <event2/buffer.h>
 #include <event2/event.h>
 #include <unistd.h>
@@ -12,28 +10,34 @@
 
 
 struct file_data {
+    FILE* fp;
     size_t size;
-    GString* file_content;
+    uint64_t length;
 };
 
 struct file_data* file_data_new()
 {
-    struct file_data* f = g_new(struct file_data, 1);
+    struct file_data* f = (struct file_data*)malloc(sizeof(struct file_data));
     f->size = -1;
-    f->file_content = g_string_new(NULL);
+    f->length = 0;
+    f->fp = fopen("./download_file", "w");
+    if (f->fp==NULL) exit(-1);
+
     return f;
 }
 
 void connecting_cb(void* arg)
 {
     printf("connection_cb\n");
-    char* msg = g_strdup("hello");
+    char* msg = strdup("hello\r\n");
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
     pr_send_peer(ud->pr_connect, msg, strlen(msg));
+    free(msg);
     struct file_data* f = file_data_new();
     ud->context = (void*)f;
-    free(msg);
 }
+
+void close_cb(void* arg);
 
 void msg_cb(void* arg)
 {
@@ -49,23 +53,20 @@ void msg_cb(void* arg)
         printf("total file size is %ld\n", f->size);
     } else {
         size_t length = evbuffer_get_length(ud->buff);
-        printf("get the msg length is %ld\n", length);
-        char* msg = g_new(char, length);
+        f->length += length;
+        printf("get the msg length is %ld of total %ld\n", f->length, f->size);
+
+        char* msg = (char*)malloc(length);
         evbuffer_remove(ud->buff, msg, length);
-        g_string_append_len(f->file_content, msg, length);
-        printf("total rece length %ld\n", f->file_content->len);
+        int r = fwrite(msg, length, 1, f->fp); 
         free(msg);
-        if (f->file_content->len == f->size) {
-            // write it to the file
-            FILE* file = fopen("download_file", "w");
-            if (file != NULL) {
-                if(fwrite(f->file_content->str, f->file_content->len, 1, file)!=1){
-                    printf("file write error\n");
-                } else {
-                    printf("suscessful write the file\n");
-                }
-                fclose(file);
-            }
+        if (r != 1) {
+            printf("file write error\n");
+            close_cb(arg);
+            exit(-1);
+        }
+        if (f->length == f->size) {
+            close_cb(arg);
             exit(0);
         }
     }
@@ -75,10 +76,8 @@ void close_cb(void* arg)
 {
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
     struct file_data* f = (struct file_data*)ud->context;
-    if (f->size == f->file_content->len) {
-        g_string_free(f->file_content, true);
-        g_free(f);
-    }
+    fclose(f->fp);
+    free(f);
 }
 
 int main()
@@ -89,7 +88,7 @@ int main()
     for (int i=0;i<100;i++) {
         sleep(2);
     }
-    pear_fog_connect_release();
+    pear_connect_release();
 
     return 0;
 }

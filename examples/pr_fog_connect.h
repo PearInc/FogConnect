@@ -52,7 +52,7 @@ void pear_usr_data_free(void *arg);
 
 int pear_fog_connect_init(const char* server_id);
 
-void pear_fog_connect_release();
+void pear_connect_release();
 
 void pear_signal_init();
 

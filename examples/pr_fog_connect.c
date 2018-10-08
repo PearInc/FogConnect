@@ -1,6 +1,7 @@
 
 #include <assert.h>
-#include <glib.h>
+#include <malloc.h>
+#include <memory.h>
 
 #include "pr_fog_connect.h"
 
@@ -26,7 +27,8 @@ static void pear_close_cb(void* connect, void* arg)
 
 pr_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_msg_callback_cb_p mcb, pear_close_cb_p clcb)
 {
-    pr_usr_data_t* ret = g_new(pr_usr_data_t, 1);
+    pr_usr_data_t* ret = (pr_usr_data_t*)malloc(sizeof(pr_usr_data_t));
+    // g_new(pr_usr_data_t, 1);
     ret->pr_connect = NULL;
     ret->buff = evbuffer_new();
     ret->closecb = clcb;
@@ -40,7 +42,7 @@ void pear_usr_data_free(void *arg)
     if (arg == NULL) return;
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
     evbuffer_free(ud->buff);
-    g_free(ud);
+    free(ud);
 }
 
 int pear_fog_connect_init(const char* server_id)
@@ -54,7 +56,7 @@ int pear_fog_connect_init(const char* server_id)
 }
 
 
-void pear_fog_connect_release()
+void pear_connect_release()
 {
     if (ctx != NULL) pr_fogconnect_release(ctx);
 }
@@ -62,7 +64,8 @@ void pear_fog_connect_release()
 
 void pear_signal_init()
 {
-    struct pr_signal_server* signal_info = g_malloc0(sizeof(struct pr_signal_server));
+    struct pr_signal_server* signal_info = malloc(sizeof(struct pr_signal_server));
+    memset(signal_info, 0, sizeof(struct pr_signal_server));
     signal_info->ctx = ctx;
     signal_info->url = SIGNAL_SERVER_URL;
     signal_info->type = "/ws";
