@@ -3,8 +3,8 @@
 #include "pubsub.h"
 
 static pubsub_client* client = NULL;
-GString* g_topic = NULL;
-GString* g_content = NULL;
+static GString* g_topic = NULL;
+static GString* g_content = NULL;
 
 static void connection()
 {

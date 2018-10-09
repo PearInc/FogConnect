@@ -45,7 +45,7 @@ void pear_usr_data_free(void *arg)
     free(ud);
 }
 
-int pear_fog_connect_init(const char* server_id)
+int pear_connect_init(const char* server_id)
 {
     if (ctx != NULL) return 0;
     ctx = pr_fogconnect_init();
@@ -75,12 +75,12 @@ void pear_signal_init()
     pr_init_signal(signal_info);
 }
 
-
-static pr_usr_data_t* usr_data = NULL;
+static pear_connecting_cb_p g_ccb = NULL;
+static pear_msg_callback_cb_p g_msb = NULL;
+static pear_close_cb_p g_closecb = NULL;
 
 void pear_callbacks(void* pr_connect, short events, void* arg)
 {
-    assert(usr_data != NULL);
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
     switch (events) {
         case PR_EVENT_CONNECTED: {
@@ -88,7 +88,7 @@ void pear_callbacks(void* pr_connect, short events, void* arg)
                 ud->pr_connect = pr_connect;
             } else if (pr_connect_is_passive(pr_connect)) {
                 // this fog node is connected by other fog node
-                ud = usr_data;
+                ud = pear_usr_data_new(g_ccb, g_msb, g_closecb);
                 pr_connect_set_userdata(pr_connect, ud);
                 ud->pr_connect = pr_connect;
             }
@@ -96,7 +96,7 @@ void pear_callbacks(void* pr_connect, short events, void* arg)
             pr_event_setcb(pr_connect, pear_msg_cb, pear_close_cb);
             
             // connect callback
-            usr_data->conncb(usr_data);
+            ud->conncb(ud);
             break;
         }
         case PR_EVENT_EOF: 
@@ -110,15 +110,17 @@ void pear_callbacks(void* pr_connect, short events, void* arg)
 }
 
 
-void pear_fogconnect_set_callback(pear_connecting_callback_cb_p cb, pear_connecting_cb_p ccb, pear_msg_callback_cb_p msb, pear_close_cb_p closecb)
+void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pear_msg_callback_cb_p msb, pear_close_cb_p closecb)
 {
-    pear_usr_data_free(usr_data);
-    usr_data = pear_usr_data_new(ccb, msb, closecb);
+    g_ccb = ccb;
+    g_msb = msb;
+    g_closecb = closecb;
     pr_fogconnect_set_callback(ctx, cb);
 }
 
 
 int pear_connect_peer(const char* id)
 {
-    return pr_connect_peer(ctx, id, TRANSPORT_PROTOCOL, 1, pear_callbacks, usr_data);
+    pr_usr_data_t* ud = pear_usr_data_new(g_ccb, g_msb, g_closecb);
+    return pr_connect_peer(ctx, id, TRANSPORT_PROTOCOL, 1, pear_callbacks, ud);
 }

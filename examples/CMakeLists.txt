@@ -5,9 +5,11 @@ project(FOG_CONNECT)
 
 set(CMAKE_C_FLAGS "-O0 -ggdb ")
 
+include_directories(${PROJECT_SOURCE_DIR}/../include)
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(/usr/include/glib-2.0)
 
+link_directories(${PROJECT_SOURCE_DIR}/../x86/linux/64/)
 
 add_subdirectory(echo/)
 add_subdirectory(filetransfer/)

@@ -66,6 +66,7 @@ static void topic_remove(topic* t, void* pr_conn)
 
 static void topic_publish(topic* t, const char* content)
 {
+    printf("publish %s %s\n", t->topic->str, content);
     g_string_printf(t->content, "%s", content);
     GString* msg = topic_make_message(t);
     for (int i=0; i < t->audidences->len; i++) { 
@@ -144,7 +145,6 @@ static void time_publish(pubsubserver* s)
             tm_time.tm_hour,tm_time.tm_min,tm_time.tm_sec);
     
     do_publish(s, "internal", "utc_time", timebuff);
-    printf("publish internal utc_time %s\n", timebuff);
 }
 
 
@@ -159,7 +159,7 @@ static void connecting_cb(void* arg)
 
 static void msg_cb(void* arg)
 {
-    printf("msg_cb\n");
+    printf("msg cb\n");
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
     enum ParseResult result = kSuccess;
     while(result == kSuccess) {

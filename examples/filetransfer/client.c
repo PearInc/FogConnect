@@ -8,6 +8,7 @@
 #include "pr_fog_connect.h"
 #include "ser.h"
 
+const char* g_file = NULL;
 
 struct file_data {
     FILE* fp;
@@ -20,7 +21,7 @@ struct file_data* file_data_new()
     struct file_data* f = (struct file_data*)malloc(sizeof(struct file_data));
     f->size = -1;
     f->length = 0;
-    f->fp = fopen("./download_file", "w");
+    f->fp = fopen(g_file, "w");
     if (f->fp==NULL) exit(-1);
 
     return f;
@@ -80,8 +81,14 @@ void close_cb(void* arg)
     free(f);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+    if (argc < 2) {
+        printf("arg is too less");
+        return -1;
+    }
+    g_file = argv[1];
+
     SETUP("1e:34:a1:44:2c:2c", connecting_cb, msg_cb, close_cb);
     pear_connect_peer("1e:34:a1:44:2c:1c");
 

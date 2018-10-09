@@ -29,7 +29,7 @@ static void connecting_cb(void* arg)
 static void msg_cb(void* arg)
 {
     pr_usr_data_t* ud = (pr_usr_data_t*)arg;
-    
+    pubsubclient_on_message(client);
 }
 
 static void close_cb(void* arg)
