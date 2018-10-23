@@ -15,13 +15,13 @@ const char* g_file = NULL;
 void connecting_cb(void* arg)
 {
     printf("conn_cb\n");
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
 }
 
 void msg_cb(void* arg)
 {
     printf("msg_cb and send the file %s\n", g_file);
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
 
     FILE* fp;
     char buf[8*1024];
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 {
     if (argc > 1) {
         g_file = argv[1];
-        SETUP("1e:34:a1:44:2c:1c", connecting_cb, msg_cb, close_cb);
+        pear_set_up("1e:34:a1:44:2c:1c", connecting_cb, msg_cb, close_cb);
 
         for (int i = 0; i < 100; i++) {
             sleep(2);

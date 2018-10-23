@@ -14,7 +14,6 @@
 
 #define SIGNAL_SERVER_URL "47.52.153.245"
 
-
 /**
  * 
  * The protocols is:
@@ -28,56 +27,38 @@
  *      PR_TRANSPORT_PROTOCOL_SCTP,
  *      PR_TRANSPORT_PROTOCOL_QUIC,
  * };
- * 
  */
 
 #define TRANSPORT_PROTOCOL PR_TRANSPORT_PROTOCOL_UDP
-
-#define SETUP(id, concb, msgcb, closecb)  \
-do {    \
-    pear_connect_init(id);\
-    pear_connect_set_callback(pear_callbacks, concb, msgcb, closecb);\
-    pear_signal_init();\
-} while(0)
-
 
 typedef void (*pear_callback_p)(void*, short, void*);
 
 typedef void (*pear_connecting_cb_p)(void* arg);
 
-typedef void (*pear_msg_callback_cb_p)(void* arg);
+typedef void (*pear_message_callback_cb_p)(void* arg);
 
 typedef void (*pear_close_cb_p)(void* arg);
 
 
-typedef struct pr_usr_data_s {
+typedef struct pear_usr_data_s {
     void* pr_connect;
 
     pear_connecting_cb_p conncb;
-    pear_msg_callback_cb_p msgcb;
+    pear_message_callback_cb_p msgcb;
     pear_close_cb_p closecb;
 
     void* context;
     struct evbuffer* buff;
-} pr_usr_data_t;
+} pear_usr_data_t;
 
-pr_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_msg_callback_cb_p mcb, pear_close_cb_p clcb);
+pear_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb);
 
 void pear_usr_data_free(void *arg);
 
 //------------------------------------------------------
-
-
-int pear_connect_init(const char* server_id);
+void pear_set_up(server_id_, connect_cb_, message_cb_, close_cb_);
 
 void pear_connect_release();
-
-void pear_signal_init();
-
-void pear_callbacks(void* pr_connect, short events, void* arg);
-
-// for the server part
-void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pear_msg_callback_cb_p msb, pear_close_cb_p closecb);
 
 // for the client part
 int pear_connect_peer(const char* id);

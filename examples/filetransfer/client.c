@@ -31,7 +31,7 @@ void connecting_cb(void* arg)
 {
     printf("connection_cb\n");
     char* msg = strdup("hello\r\n");
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     pr_send_peer(ud->pr_connect, msg, strlen(msg));
     free(msg);
     struct file_data* f = file_data_new();
@@ -43,7 +43,7 @@ void close_cb(void* arg);
 void msg_cb(void* arg)
 {
     printf("msg cb\n");
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     if (f->size == -1) {
         // get the file size
@@ -75,7 +75,7 @@ void msg_cb(void* arg)
 
 void close_cb(void* arg)
 {
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     fclose(f->fp);
     free(f);
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     }
     g_file = argv[1];
 
-    SETUP("1e:34:a1:44:2c:2c", connecting_cb, msg_cb, close_cb);
+    pear_set_up("1e:34:a1:44:2c:2c", connecting_cb, msg_cb, close_cb);
     pear_connect_peer("1e:34:a1:44:2c:1c");
 
     for (int i=0;i<100;i++) {
