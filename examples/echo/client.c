@@ -10,7 +10,7 @@
 #include "fogconnect.h"
 #include "pr_fog_connect.h"
 
-void connecting_cb(void* arg)
+void on_connect(void* arg)
 {
     pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     char* msg = strdup("hello\r\n");
@@ -19,7 +19,7 @@ void connecting_cb(void* arg)
     free(msg);
 }
 
-void msg_cb(void* arg)
+void on_message(void* arg)
 {
     pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     size_t len = 0;
@@ -30,14 +30,14 @@ void msg_cb(void* arg)
     }
 }
 
-void close_cb(void* arg)
+void on_close(void* arg)
 {
     // call this function when the connection is closed
 }
 
 int main()
 {
-    pear_set_up("1e:34:a1:44:2c:2c", connecting_cb, msg_cb, close_cb);
+    pear_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
     pear_connect_peer("1e:34:a1:44:2c:1c");
 
     for (int i=0;i<100;i++) {
