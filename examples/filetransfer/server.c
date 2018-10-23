@@ -12,13 +12,13 @@
 
 const char* g_file = NULL;
 
-void connecting_cb(void* arg)
+void on_connect(void* arg)
 {
     printf("conn_cb\n");
     pear_usr_data_t* ud = (pear_usr_data_t*)arg;
 }
 
-void msg_cb(void* arg)
+void on_message(void* arg)
 {
     printf("msg_cb and send the file %s\n", g_file);
     pear_usr_data_t* ud = (pear_usr_data_t*)arg;
@@ -40,7 +40,7 @@ void msg_cb(void* arg)
     }
 }
 
-void close_cb(void* arg)
+void on_close(void* arg)
 {
     
 }
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 {
     if (argc > 1) {
         g_file = argv[1];
-        pear_set_up("1e:34:a1:44:2c:1c", connecting_cb, msg_cb, close_cb);
+        pear_set_up("1e:34:a1:44:2c:1c", on_connect, on_message, on_close);
 
         for (int i = 0; i < 100; i++) {
             sleep(2);
