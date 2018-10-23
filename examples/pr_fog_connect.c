@@ -5,13 +5,20 @@
 
 #include "pr_fog_connect.h"
 
+static void pear_callbacks(void* pr_connect, short events, void* arg);
+
+static void pear_signal_init();
+
+static int pear_connect_init(const char* server_id);
+
+static void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pear_message_callback_cb_p msb, pear_close_cb_p closecb);
 
 static void* ctx = NULL;
 
 
 static void pear_msg_cb(void* pr_connect, void* arg, void* buf, int size)
 {
-    pr_usr_data_t* user_data = (pr_usr_data_t*)arg;
+    pear_usr_data_t* user_data = (pear_usr_data_t*)arg;
     evbuffer_add(user_data->buff, (char*)buf, size);
     user_data->msgcb(user_data);
 }
@@ -19,16 +26,16 @@ static void pear_msg_cb(void* pr_connect, void* arg, void* buf, int size)
 
 static void pear_close_cb(void* connect, void* arg)
 {
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     ud->closecb(ud);
     pear_usr_data_free(ud);
 }
 
 
-pr_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_msg_callback_cb_p mcb, pear_close_cb_p clcb)
+pear_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb)
 {
-    pr_usr_data_t* ret = (pr_usr_data_t*)malloc(sizeof(pr_usr_data_t));
-    // g_new(pr_usr_data_t, 1);
+    pear_usr_data_t* ret = (pear_usr_data_t*)malloc(sizeof(pear_usr_data_t));
+    // g_new(pear_usr_data_t, 1);
     ret->pr_connect = NULL;
     ret->buff = evbuffer_new();
     ret->closecb = clcb;
@@ -40,12 +47,12 @@ pr_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_msg_callback_cb_
 void pear_usr_data_free(void *arg)
 {
     if (arg == NULL) return;
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     evbuffer_free(ud->buff);
     free(ud);
 }
 
-int pear_connect_init(const char* server_id)
+static int pear_connect_init(const char* server_id)
 {
     if (ctx != NULL) return 0;
     ctx = pr_fogconnect_init();
@@ -62,7 +69,7 @@ void pear_connect_release()
 }
 
 
-void pear_signal_init()
+static void pear_signal_init()
 {
     struct pr_signal_server* signal_info = malloc(sizeof(struct pr_signal_server));
     memset(signal_info, 0, sizeof(struct pr_signal_server));
@@ -75,13 +82,14 @@ void pear_signal_init()
     pr_init_signal(signal_info);
 }
 
+
 static pear_connecting_cb_p g_ccb = NULL;
-static pear_msg_callback_cb_p g_msb = NULL;
+static pear_message_callback_cb_p g_msb = NULL;
 static pear_close_cb_p g_closecb = NULL;
 
-void pear_callbacks(void* pr_connect, short events, void* arg)
+static void pear_callbacks(void* pr_connect, short events, void* arg)
 {
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     switch (events) {
         case PR_EVENT_CONNECTED: {
             if (ud != NULL) {
@@ -110,7 +118,15 @@ void pear_callbacks(void* pr_connect, short events, void* arg)
 }
 
 
-void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pear_msg_callback_cb_p msb, pear_close_cb_p closecb)
+void pear_set_up(const char* server_id_, pear_connecting_cb_p connect_cb_, pear_message_callback_cb_p message_cb_, pear_close_cb_p close_cb_)
+{
+    pear_connect_init(server_id_);
+    pear_connect_set_callback(pear_callbacks, connect_cb_, message_cb_, close_cb_);
+    pear_signal_init();
+}
+
+
+static void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pear_message_callback_cb_p msb, pear_close_cb_p closecb)
 {
     g_ccb = ccb;
     g_msb = msb;
@@ -121,6 +137,6 @@ void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pea
 
 int pear_connect_peer(const char* id)
 {
-    pr_usr_data_t* ud = pear_usr_data_new(g_ccb, g_msb, g_closecb);
+    pear_usr_data_t* ud = pear_usr_data_new(g_ccb, g_msb, g_closecb);
     return pr_connect_peer(ctx, id, TRANSPORT_PROTOCOL, 1, pear_callbacks, ud);
 }

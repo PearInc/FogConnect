@@ -7,14 +7,14 @@
 #include "fogconnect.h"
 #include "pr_fog_connect.h"
 
-void connecting_cb(void* arg)
+void on_connect(void* arg)
 {
     printf("conn_cb\n");
 }
 
-void msg_cb(void* arg)
+void on_message(void* arg)
 {
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
@@ -29,13 +29,13 @@ void msg_cb(void* arg)
     }
 }
 
-void close_cb(void* arg)
+void on_close(void* arg)
 {
 }
 
 int main()
 {
-    SETUP("1e:34:a1:44:2c:1c", connecting_cb, msg_cb, close_cb);
+    pear_set_up("1e:34:a1:44:2c:1c", on_connect, on_message, on_close);
 
     for (int i = 0; i < 100; i++) {
         sleep(2);

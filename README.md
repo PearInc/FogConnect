@@ -87,73 +87,88 @@ Mem: 7840 MB
 ```C
 #include "pr_fog_connect.h"
 
-void connecting_cb(void* arg) {
+void on_connect(void* arg)
+{
     printf("conn_cb\n");
 }
 
-void msg_cb(void* arg) {
-    printf("msg_cb\n");
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+void on_message(void* arg)
+{
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
-        printf("get the msg %s\n", msg);
-        char* return_msg = g_strdup_printf("%s\r\n", msg);
-        pr_send_peer(ud->pr_connect, return_msg, strlen(return_msg));
+        printf("get the msg %s from the peer\n", msg);
+        int len = strlen(msg)+2;
+        char* return_msg = (char*)malloc(len+1);
+        sprintf(return_msg, "%s\r\n", msg);
+        pr_send_peer(ud->pr_connect, return_msg, len);
+        printf("sending the msg %s back to the peer\n", msg);
         free(msg);
         free(return_msg);
     }
 }
 
-void close_cb(void* pr_connect, void* arg) {
-    pear_usr_data_free(arg);
+void on_close(void* arg)
+{
 }
 
-int main() {
-    SETUP("1e:34:a1:44:2c:1c", connecting_cb, msg_cb, close_cb);
+int main()
+{
+    pear_set_up("1e:34:a1:44:2c:1c", on_connect, on_message, on_close);
+
     for (int i = 0; i < 100; i++) {
         sleep(2);
     }
     pear_connect_release();
+
     return 0;
 }
+
 ```
 ### Client
 
 ```C
 #include "pr_fog_connect.h"
 
-void connecting_cb(void* arg) {
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
-    char* msg = g_strdup("Hello\r\n");
+void on_connect(void* arg)
+{
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    char* msg = strdup("hello\r\n");
     pr_send_peer(ud->pr_connect, msg, strlen(msg));
+    printf("sending the msg %s to peer\n", msg);
     free(msg);
 }
 
-void msg_cb(void* arg) {
-    printf("msg cb\n");
-    pr_usr_data_t* ud = (pr_usr_data_t*)arg;
+void on_message(void* arg)
+{
+    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
-        printf("get the msg %s\n", msg);
+        printf("get the msg %s from peer\n", msg);
         free(msg);
     }
 }
 
-void close_cb(void* arg) {
-    // call this method when the connection is closed
+void on_close(void* arg)
+{
+    // call this function when the connection is closed
 }
 
-int main() {
-    SETUP("1e:34:a1:44:2c:2c", connecting_cb, msg_cb, close_cb);
+int main()
+{
+    pear_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
     pear_connect_peer("1e:34:a1:44:2c:1c");
+
     for (int i=0;i<100;i++) {
         sleep(2);
     }
     pear_connect_release();
+
     return 0;
 }
+
 ```
 
 
