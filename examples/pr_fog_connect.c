@@ -20,14 +20,18 @@ static void pear_msg_cb(void* pr_connect, void* arg, void* buf, int size)
 {
     pear_usr_data_t* user_data = (pear_usr_data_t*)arg;
     evbuffer_add(user_data->buff, (char*)buf, size);
-    user_data->msgcb(user_data);
+    if (user_data->msgcb != NULL) {
+        user_data->msgcb(user_data);
+    }
 }
 
 
 static void pear_close_cb(void* connect, void* arg)
 {
     pear_usr_data_t* ud = (pear_usr_data_t*)arg;
-    ud->closecb(ud);
+    if (ud->closecb != NULL) {
+        ud->closecb(ud);
+    }
     pear_usr_data_free(ud);
 }
 
@@ -42,6 +46,13 @@ pear_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_message_callba
     ret->conncb = ccb;
     ret->msgcb = mcb;
     return ret;
+}
+
+void pear_set_callbacks(pear_usr_data_t* ud, pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb)
+{
+    ud->closecb = clcb;
+    ud->conncb = ccb;
+    ud->msgcb = mcb;
 }
 
 void pear_usr_data_free(void *arg)
@@ -104,7 +115,9 @@ static void pear_callbacks(void* pr_connect, short events, void* arg)
             pr_event_setcb(pr_connect, pear_msg_cb, pear_close_cb);
             
             // connect callback
-            ud->conncb(ud);
+            if (ud->conncb != NULL) {
+                ud->conncb(ud);
+            }
             break;
         }
         case PR_EVENT_EOF: 

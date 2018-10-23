@@ -55,6 +55,8 @@ pear_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_message_callba
 
 void pear_usr_data_free(void *arg);
 
+void pear_set_callbacks(pear_usr_data_t* ud, pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb);
+
 //------------------------------------------------------
 void pear_set_up(const char* server_id_, pear_connecting_cb_p connect_cb_, pear_message_callback_cb_p message_cb_, pear_close_cb_p close_cb_);
 
