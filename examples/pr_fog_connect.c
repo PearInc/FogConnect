@@ -118,7 +118,7 @@ static void pear_callbacks(void* pr_connect, short events, void* arg)
 }
 
 
-void pear_set_up(server_id_, connect_cb_, message_cb_, close_cb_)
+void pear_set_up(const char* server_id_, pear_connecting_cb_p connect_cb_, pear_message_callback_cb_p message_cb_, pear_close_cb_p close_cb_)
 {
     pear_connect_init(server_id_);
     pear_connect_set_callback(pear_callbacks, connect_cb_, message_cb_, close_cb_);
