@@ -43,7 +43,7 @@ sudo apt-get install git g++ make
 Install dependencies:
 
 ``` shell
-sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev ibevent-dev libglib2.0-dev 
+sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev libevent-dev libglib2.0-dev 
 ```
 
 Install libusrsctp:
