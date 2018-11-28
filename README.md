@@ -177,10 +177,6 @@ int main()
 
 ### [更多例子](https://github.com/PearInc/FogConnect/tree/master/examples)
 
-## 文档
-- [FogConnet协议栈](doc/PTP-Connect协议栈.md)
-
-
 ## 开发者简介
 - 吴必磊(w@pear.hk)
     - 知名数据恢复软件Any Data Recovery Pro作者、反汇编与破解专家（同时也是不知名的健身教练）.
