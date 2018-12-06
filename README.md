@@ -6,7 +6,7 @@ FogConnet 是用于P2P网络中连接，调度，传输等功能于一体的组�
 ![fog_connectstack](./doc/images/fogconnectstack.png)
 
 ### 特性
-- 支持多种传输控制协议(QUIC,RTC,KCP,uTP,SCTP等)。
+- 支持多种传输控制协议(QUIC, RTC, KCP, uTP, SCTP等)。
 - 探测NAT类型，并收集和维护用于P2P连接的IP：PORT列表。
 - 支持双向“打洞”和高级端口预测。
 - NAT类型最优匹配组合策略。
@@ -28,7 +28,7 @@ FogConnect depends on following packages:
 
 
 ## Supported Environment
-- Ubuntu/Linuxmint
+- Ubuntu/LinuxMint
 
 
 ### Ubuntu/LinuxMint
@@ -58,7 +58,7 @@ sudo cp usrsctplib/libusrsctp.a /usr/lib/x86_64-linux-gnu/
 #### Compile FogConnect
 ##### Prepare the FogConnect env
 ``` shell
-git clone git@github.com:PearInc/FogConnect.git
+git clone git@github.com:fogInc/FogConnect.git
 cd FogConnect
 sudo cp include/fogconnect.h /usr/include/
 sudo cp x86/linux/64/libfog* /usr/lib/x86_64-linux-gnu/
@@ -94,7 +94,7 @@ void on_connect(void* arg)
 
 void on_message(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
@@ -115,12 +115,12 @@ void on_close(void* arg)
 
 int main()
 {
-    pear_set_up("1e:34:a1:44:2c:1c", on_connect, on_message, on_close);
+    fog_set_up("1e:34:a1:44:2c:1c", on_connect, on_message, on_close);
 
     for (int i = 0; i < 100; i++) {
         sleep(2);
     }
-    pear_connect_release();
+    fog_connect_release();
 
     return 0;
 }
@@ -133,7 +133,7 @@ int main()
 
 void on_connect(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     char* msg = strdup("hello\r\n");
     pr_send_peer(ud->pr_connect, msg, strlen(msg));
     printf("sending the msg %s to peer\n", msg);
@@ -142,7 +142,7 @@ void on_connect(void* arg)
 
 void on_message(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
@@ -158,13 +158,13 @@ void on_close(void* arg)
 
 int main()
 {
-    pear_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
-    pear_connect_peer("1e:34:a1:44:2c:1c");
+    fog_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
+    fog_connect_peer("1e:34:a1:44:2c:1c");
 
     for (int i=0;i<100;i++) {
         sleep(2);
     }
-    pear_connect_release();
+    fog_connect_release();
 
     return 0;
 }
@@ -175,11 +175,11 @@ int main()
 ### 第三方协议无缝连接
 ![third part connect](doc/images/third_part_connect.png)
 
-### [更多例子](https://github.com/PearInc/FogConnect/tree/master/examples)
+### [更多例子](https://github.com/fogInc/FogConnect/tree/master/examples)
 
 ## 开发者简介
-- 吴必磊(w@pear.hk)
+- 吴必磊(w@fog.hk)
     - 知名数据恢复软件Any Data Recovery Pro作者、反汇编与破解专家（同时也是不知名的健身教练）.
 
-- 陈荡漾(66@pear.hk)
+- 陈荡漾(66@fog.hk)
     

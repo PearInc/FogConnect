@@ -31,7 +31,7 @@ void on_connect(void* arg)
 {
     printf("connection_cb\n");
     char* msg = strdup("hello\r\n");
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     pr_send_peer(ud->pr_connect, msg, strlen(msg));
     free(msg);
     struct file_data* f = file_data_new();
@@ -40,7 +40,7 @@ void on_connect(void* arg)
 
 void on_close(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     fclose(f->fp);
     free(f);
@@ -50,7 +50,7 @@ void on_close(void* arg)
 void on_message(void* arg)
 {
     printf("msg cb\n");
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     if (f->size == -1) {
         // get the file size
@@ -88,13 +88,13 @@ int main(int argc, char* argv[])
     }
     g_file = argv[1];
 
-    pear_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
-    pear_connect_peer("1e:34:a1:44:2c:1c");
+    fog_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
+    fog_connect_peer("1e:34:a1:44:2c:1c");
 
     for (int i=0;i<100;i++) {
         sleep(2);
     }
-    pear_connect_release();
+    fog_connect_release();
 
     return 0;
 }

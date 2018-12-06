@@ -5,7 +5,7 @@
 #include "fogconnect.h"
 
 
-struct pear_usr_data 
+struct fog_usr_data 
 {
     void* pr_data;
 };
@@ -72,7 +72,7 @@ void pr_set_third_callback(void* pr_connect)
 
 void pr_connect_callback(void* pr_connect, short events, void* cbarg)
 {
-    struct pear_usr_data* arg = (cbarg);
+    struct fog_usr_data* arg = (cbarg);
     switch (events)
     {
         case PR_EVENT_CONNECTED:
@@ -81,7 +81,7 @@ void pr_connect_callback(void* pr_connect, short events, void* cbarg)
             else if (pr_connect_is_passive(pr_connect))
             {
                 //表示当前雾节点，被其它雾节点发起了链接，当前雾节点为被动方。
-                struct pear_usr_data* cbarg_data = g_malloc0(sizeof(struct pear_usr_data));
+                struct fog_usr_data* cbarg_data = g_malloc0(sizeof(struct fog_usr_data));
                 pr_connect_set_userdata(pr_connect, cbarg_data);
                 //保存链接信息以便其它过程使用。
                 cbarg_data->pr_data = pr_connect;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     //以下为主动对雾节点发起的链接。
     {
         //quic protocol
-    void* cbarg_udp = g_malloc0(sizeof(struct pear_usr_data));
+    void* cbarg_udp = g_malloc0(sizeof(struct fog_usr_data));
     int pr_udp = pr_connect_peer(ctx, "ee:34:a1:44:2c:1c",
                                PR_TRANSPORT_PROTOCOL_QUIC, 
                                1, //注意这个参数，与服务的选择相关联。请看pr_set_third_callback函数的处理。

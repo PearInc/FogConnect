@@ -29,40 +29,39 @@
  * };
  */
 
-#define TRANSPORT_PROTOCOL PR_TRANSPORT_PROTOCOL_UDP
+#define TRANSPORT_PROTOCOL FOG_TRANSPORT_PROTOCOL_KCP
 
-typedef void (*pear_callback_p)(void*, short, void*);
+typedef void (*event_cb)(void*, short, void*);
 
-typedef void (*pear_connecting_cb_p)(void* arg);
+typedef void (*connect_cb)(void* arg);
 
-typedef void (*pear_message_callback_cb_p)(void* arg);
+typedef void (*receive_cb)(void* arg);
 
-typedef void (*pear_close_cb_p)(void* arg);
+typedef void (*close_cb)(void* arg);
 
 
-typedef struct pear_usr_data_s {
+typedef struct {
     void* pr_connect;
 
-    pear_connecting_cb_p conncb;
-    pear_message_callback_cb_p msgcb;
-    pear_close_cb_p closecb;
+    connect_cb on_connect;
+    receive_cb on_receive;
+    close_cb on_close;
 
     void* context;
     struct evbuffer* buff;
-} pear_usr_data_t;
+} fog_connectiion_info;
 
-pear_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb);
-
-void pear_usr_data_free(void *arg);
-
-void pear_set_callbacks(pear_usr_data_t* ud, pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb);
+void fog_set_callbacks(fog_connectiion_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close);
 
 //------------------------------------------------------
-void pear_set_up(const char* server_id_, pear_connecting_cb_p connect_cb_, pear_message_callback_cb_p message_cb_, pear_close_cb_p close_cb_);
+void fog_set_up(const char* server_id);
 
-void pear_connect_release();
+void fog_service_set_callback(connect_cb on_connect, receive_cb on_receive, close_cb on_close);
+
+void fog_exit();
 
 // for the client part
-int pear_connect_peer(const char* id);
+
+int fog_connect_peer(const char* id, int protocol, connect_cb on_connect, receive_cb on_receive, close_cb on_close);
 
 #endif // !PR_FOG_CONNECT_H

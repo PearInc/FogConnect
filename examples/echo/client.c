@@ -12,21 +12,25 @@
 
 void on_connect(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     char* msg = strdup("hello\r\n");
-    pr_send_peer(ud->pr_connect, msg, strlen(msg));
-    printf("sending the msg %s to peer\n", msg);
+    fog_send_data(ud->pr_connect, msg, strlen(msg));
+    printf("sending: %s\n", msg);
     free(msg);
 }
 
-void on_message(void* arg)
+void on_receive(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
-        printf("get the msg %s from peer\n", msg);
+        printf("receiving: %s\n", msg);
+        char* return_msg = (char*)malloc(len+1);
+        sprintf(return_msg, "%s\r\n", msg);
+        fog_send_data(ud->pr_connect, return_msg, strlen(return_msg));
         free(msg);
+        free(return_msg);
     }
 }
 
@@ -37,14 +41,10 @@ void on_close(void* arg)
 
 int main()
 {
-    pear_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
-    pear_connect_peer("1e:34:a1:44:2c:1c");
-
-    for (int i=0;i<100;i++) {
-        sleep(2);
-    }
-    pear_connect_release();
-
+    fog_set_up("1e:34:a1:44:2c:2c");
+    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive, on_close);
+    getchar();
+    fog_exit();
     return 0;
 }
 

@@ -107,18 +107,18 @@ static topic* get_topic(pubsubserver* s, const char* tp)
 
 static void do_subscribe(pubsubserver* s, void* arg, const char* tp)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     GHashTable* connection_subscription = (GHashTable*)ud->context;
     char* tpc = g_strdup(tp);
     g_hash_table_add(connection_subscription, tpc);
     topic* t = get_topic(s, tp);
-    topic_add(t, ud->conncb);
+    topic_add(t, ud->on_connect);
 }
 
 
 static void do_unsubscribe(pubsubserver* s, void* arg, const char* tp)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     GHashTable* connection_subscription = (GHashTable*)ud->context;
     g_hash_table_remove(connection_subscription, tp);
 }
@@ -152,7 +152,7 @@ static void connecting_cb(void* arg)
 {
     printf("conn_cb\n");
     GHashTable* connection_subscription = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     ud->context = connection_subscription;
 }
 
@@ -160,7 +160,7 @@ static void connecting_cb(void* arg)
 static void msg_cb(void* arg)
 {
     printf("msg cb\n");
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     enum ParseResult result = kSuccess;
     while(result == kSuccess) {
         GString* cmd = g_string_new(NULL);
@@ -186,7 +186,7 @@ static void msg_cb(void* arg)
 
 static void close_cb(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     GHashTable* connection_subscription = (GHashTable*)ud->context;
 
     GHashTableIter iter;
@@ -211,7 +211,7 @@ int main()
     struct event_base* base = event_base_new();
 
     pubsubserver_init();
-    pear_set_up("1e:34:a1:44:2c:1c", connecting_cb, msg_cb, close_cb);
+    fog_set_up("1e:34:a1:44:2c:1c", connecting_cb, msg_cb, close_cb);
 
     struct timeval tv;
     tv.tv_sec = 2;
@@ -220,7 +220,7 @@ int main()
     event_add(timer, &tv);
     event_base_dispatch(base);
 
-    pear_connect_release();
+    fog_connect_release();
     return 0;
 }
 

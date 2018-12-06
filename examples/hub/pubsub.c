@@ -22,7 +22,7 @@ bool pubsubclient_publish(pubsub_client* client, const char* tp, const char* con
 
 void pubsubclient_on_message(pubsub_client* client)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)client->arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)client->arg;
     enum ParseResult result = kSuccess;
     while (result == kSuccess) {
         GString* cmd = g_string_new(NULL);

@@ -21,14 +21,14 @@ static void connection()
 
 static void connecting_cb(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     client->arg = arg;
     connection();
 }
 
 static void msg_cb(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     pubsubclient_on_message(client);
 }
 
@@ -41,16 +41,16 @@ static void close_cb(void* arg)
 
 int main()
 {
-    pear_set_up("1e:34:a1:44:2c:3c", connecting_cb, msg_cb, close_cb);
+    fog_set_up("1e:34:a1:44:2c:3c", connecting_cb, msg_cb, close_cb);
     client = g_new(pubsub_client, 1);
 
-    pear_connect_peer("1e:34:a1:44:2c:1c");
+    fog_connect_peer("1e:34:a1:44:2c:1c");
 
     for (int i=0;i<100;i++) {
         sleep(2);
     }
 
-    pear_connect_release();
+    fog_connect_release();
 
     return 0;
 }

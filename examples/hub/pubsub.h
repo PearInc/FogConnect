@@ -12,7 +12,7 @@
 
 #define SEND_MESSAGE(client, message) \
 do {    \
-    pear_usr_data_t* ud = (pear_usr_data_t*)client->arg;    \
+    fog_connectiion_info* ud = (fog_connectiion_info*)client->arg;    \
     pr_send_peer(ud->pr_connect, message, strlen(message)); \
     g_free(message); \
 } while(0)
