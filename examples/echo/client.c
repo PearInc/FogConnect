@@ -29,6 +29,7 @@ void on_receive(void* arg)
         char* return_msg = (char*)malloc(len+1);
         sprintf(return_msg, "%s\r\n", msg);
         fog_send_data(ud->pr_connect, return_msg, strlen(return_msg));
+        printf("sending: %s\n", msg);
         free(msg);
         free(return_msg);
     }

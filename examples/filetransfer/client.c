@@ -47,7 +47,7 @@ void on_close(void* arg)
 }
 
 
-void on_message(void* arg)
+void on_receive(void* arg)
 {
     printf("msg cb\n");
     fog_connectiion_info* ud = (fog_connectiion_info*)arg;
@@ -88,14 +88,11 @@ int main(int argc, char* argv[])
     }
     g_file = argv[1];
 
-    fog_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
-    fog_connect_peer("1e:34:a1:44:2c:1c");
+    fog_set_up("1e:34:a1:44:2c:2c");
+    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive, on_close);
 
-    for (int i=0;i<100;i++) {
-        sleep(2);
-    }
-    fog_connect_release();
-
+    getchar();
+    fog_exit();
     return 0;
 }
 

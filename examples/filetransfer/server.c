@@ -18,7 +18,7 @@ void on_connect(void* arg)
     fog_connectiion_info* ud = (fog_connectiion_info*)arg;
 }
 
-void on_message(void* arg)
+void on_receive(void* arg)
 {
     printf("msg_cb and send the file %s\n", g_file);
     fog_connectiion_info* ud = (fog_connectiion_info*)arg;
@@ -49,12 +49,10 @@ int main(int argc, char* argv[])
 {
     if (argc > 1) {
         g_file = argv[1];
-        fog_set_up("1e:34:a1:44:2c:1c", on_connect, on_message, on_close);
-
-        for (int i = 0; i < 100; i++) {
-            sleep(2);
-        }
-        fog_connect_release();
+        fog_set_up("1e:34:a1:44:2c:1c");
+        fog_service_set_callback(on_connect, on_receive, on_close);
+        getchar();
+        fog_exit();
     } else {
         printf("arg is too less");
     }
