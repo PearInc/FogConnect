@@ -13,9 +13,8 @@ const char* g_file = NULL;
 
 pthread_mutex_t mutex;
 
-clock_t start;
-clock_t end;
-int64_t seconds;
+time_t start;
+time_t end;
 int64_t bytes_read;
 
 struct file_data {
@@ -44,7 +43,7 @@ void on_connect(void* arg)
     free(msg);
     struct file_data* f = file_data_new();
     ud->context = (void*)f;
-    start = clock();
+    start = time(NULL);
 }
 
 void on_close(void* arg)
@@ -54,7 +53,7 @@ void on_close(void* arg)
     fclose(f->fp);
     bytes_read = f->length;
     free(f);
-    end = clock();
+    end = time(NULL);
     pthread_mutex_unlock(&mutex);
 }
 
@@ -73,7 +72,7 @@ void on_receive(void* arg)
     } else {
         size_t length = evbuffer_get_length(ud->buff);
         f->length += length;
-        printf("get the file %ld of total %ld\n", f->length, f->size);
+        // printf("get the file %ld of total %ld\n", f->length, f->size);
 
         char* msg = (char*)malloc(length);
         evbuffer_remove(ud->buff, msg, length);
@@ -106,8 +105,9 @@ int main(int argc, char* argv[])
     pthread_mutex_unlock(&mutex);
     pthread_mutex_destroy(&mutex);
 
-    seconds = (end-start)/CLOCKS_PER_SEC;
-    float speed = (float)bytes_read/(8*1024*1024*seconds);
+    double seconds = (double)(end-start);
+    printf("seconds: %f\n", seconds);
+    double speed = (double)bytes_read/(1024*1024*seconds)*8;
     printf("\nthe speed is %f Mb/s\n", speed);
     fog_exit();
     return 0;
