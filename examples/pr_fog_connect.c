@@ -16,6 +16,7 @@ static void* ctx = NULL;
 
 static void fog_on_receive(void* pr_connect, void* arg, void* buf, int size)
 {
+    if (size <= 0) return;
     fog_connectiion_info* user_data = (fog_connectiion_info*)arg;
     evbuffer_add(user_data->buff, (char*)buf, size);
     if (user_data->on_receive != NULL) {

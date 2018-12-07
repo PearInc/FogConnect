@@ -12,9 +12,8 @@ include_directories(/usr/include/glib-2.0)
 link_directories(${PROJECT_SOURCE_DIR}/../x86/linux/64/)
 
 add_subdirectory(echo/)
-# add_subdirectory(filetransfer/)
-# add_subdirectory(hub/)
-# add_subdirectory(benchmark/)
+add_subdirectory(filetransfer/)
+
 
 add_library(fog_connection pr_fog_connect.c)
 target_link_libraries(fog_connection 

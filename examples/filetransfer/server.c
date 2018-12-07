@@ -32,12 +32,13 @@ void on_receive(void* arg)
     fseek(fp, 0L, SEEK_SET);
     memset(buf, 0, 8);
     ser_writedata64(size, buf);
-    pr_send_peer(ud->pr_connect, buf, 8);
+    fog_send_data(ud->pr_connect, buf, 8);
 
     size_t n;
     while((n=fread(buf, 1, sizeof(buf), fp)) != 0) {
-        pr_send_peer(ud->pr_connect, buf, n);
+        fog_send_data(ud->pr_connect, buf, n);
     }
+    fclose(fp);
 }
 
 void on_close(void* arg)

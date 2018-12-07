@@ -3,12 +3,20 @@
 #include <unistd.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #include "fogconnect.h"
 #include "pr_fog_connect.h"
 #include "ser.h"
 
 const char* g_file = NULL;
+
+pthread_mutex_t mutex;
+
+clock_t start;
+clock_t end;
+int64_t seconds;
+int64_t bytes_read;
 
 struct file_data {
     FILE* fp;
@@ -32,10 +40,11 @@ void on_connect(void* arg)
     printf("connection_cb\n");
     char* msg = strdup("hello\r\n");
     fog_connectiion_info* ud = (fog_connectiion_info*)arg;
-    pr_send_peer(ud->pr_connect, msg, strlen(msg));
+    fog_send_data(ud->pr_connect, msg, strlen(msg));
     free(msg);
     struct file_data* f = file_data_new();
     ud->context = (void*)f;
+    start = clock();
 }
 
 void on_close(void* arg)
@@ -43,13 +52,15 @@ void on_close(void* arg)
     fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     fclose(f->fp);
+    bytes_read = f->length;
     free(f);
+    end = clock();
+    pthread_mutex_unlock(&mutex);
 }
 
 
 void on_receive(void* arg)
 {
-    printf("msg cb\n");
     fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     if (f->size == -1) {
@@ -62,7 +73,7 @@ void on_receive(void* arg)
     } else {
         size_t length = evbuffer_get_length(ud->buff);
         f->length += length;
-        printf("get the msg length is %ld of total %ld\n", f->length, f->size);
+        printf("get the file %ld of total %ld\n", f->length, f->size);
 
         char* msg = (char*)malloc(length);
         evbuffer_remove(ud->buff, msg, length);
@@ -70,12 +81,10 @@ void on_receive(void* arg)
         free(msg);
         if (r != 1) {
             printf("file write error\n");
-            close_cb(arg);
-            exit(-1);
+            on_close(arg);
         }
         if (f->length == f->size) {
-            close_cb(arg);
-            exit(0);
+            on_close(arg);
         }
     }
 }
@@ -91,7 +100,15 @@ int main(int argc, char* argv[])
     fog_set_up("1e:34:a1:44:2c:2c");
     fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive, on_close);
 
-    getchar();
+    pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&mutex);
+    pthread_mutex_unlock(&mutex);
+    pthread_mutex_destroy(&mutex);
+
+    seconds = (end-start)/CLOCKS_PER_SEC;
+    float speed = (float)bytes_read/(8*1024*1024*seconds);
+    printf("\nthe speed is %f Mb/s\n", speed);
     fog_exit();
     return 0;
 }
