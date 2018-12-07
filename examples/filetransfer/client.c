@@ -107,8 +107,8 @@ int main(int argc, char* argv[])
 
     double seconds = (double)(end-start);
     printf("seconds: %f\n", seconds);
-    double speed = (double)bytes_read/(1024*1024*seconds)*8;
-    printf("\nthe speed is %f Mb/s\n", speed);
+    double speed = (double)bytes_read/(1024*1024*seconds);
+    printf("\nthe speed is %f mb/s\n", speed);
     fog_exit();
     return 0;
 }
