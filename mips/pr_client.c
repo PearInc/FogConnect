@@ -13,7 +13,7 @@
 #include "fogconnect.h"
 
 
-struct pr_user_data 
+struct fog_usr_data 
 {
     void* pr_data;
     int    socket;
@@ -139,7 +139,7 @@ void pr_set_third_callback(void* pr_conn)
 
 void fog_connect_callback(void* pr_conn, short events, void* cb_arg)
 {
-    struct pr_user_data* user_data = (cb_arg);
+    struct fog_usr_data* arg = (cbarg);
     switch (events)
     {
         case FOG_EVENT_CONNECTED:
@@ -155,8 +155,8 @@ void fog_connect_callback(void* pr_conn, short events, void* cb_arg)
             {
 #if 0
                 //表示当前雾节点，被其它雾节点发起了链接，当前雾节点为被动方。
-                struct pr_user_data* cb_arg_data = malloc(sizeof(struct pr_user_data));
-                fog_set_userdata(pr_conn, cb_arg_data);
+                struct fog_usr_data* cbarg_data = g_malloc0(sizeof(struct fog_usr_data));
+                pr_connect_set_userdata(pr_connect, cbarg_data);
                 //保存链接信息以便其它过程使用。
                 cb_arg_data->pr_data = pr_conn;
 #endif
@@ -279,9 +279,9 @@ int main(int argc, char *argv[])
     //以下为主动对雾节点发起的链接。
     {
         //quic protocol
-        void* user_data = malloc(sizeof(struct pr_user_data));
-        int pr_udp = fog_connect(ctx, "ee:34:a1:44:2c:1c",
-                               FOG_TRANSPORT_PROTOCOL_KCP,
+    void* cbarg_udp = g_malloc0(sizeof(struct fog_usr_data));
+    int pr_udp = pr_connect_peer(ctx, "ee:34:a1:44:2c:1c",
+                               PR_TRANSPORT_PROTOCOL_QUIC, 
                                1, //注意这个参数，与服务的选择相关联。请看pr_set_third_callback函数的处理。
                                fog_connect_callback, user_data);
     }

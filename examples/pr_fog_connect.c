@@ -5,151 +5,142 @@
 
 #include "pr_fog_connect.h"
 
-static void pear_callbacks(void* pr_connect, short events, void* arg);
+static void fog_on_event(void* pr_connect, short events, void* arg);
 
-static void pear_signal_init();
+static void fog_signal_server_init();
 
-static int pear_connect_init(const char* server_id);
-
-static void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pear_message_callback_cb_p msb, pear_close_cb_p closecb);
+static void fog_usr_data_free(void *arg);
 
 static void* ctx = NULL;
 
 
-static void pear_msg_cb(void* pr_connect, void* arg, void* buf, int size)
+static void fog_on_receive(void* pr_connect, void* arg, void* buf, int size)
 {
-    pear_usr_data_t* user_data = (pear_usr_data_t*)arg;
+    if (size <= 0) return;
+    fog_connectiion_info* user_data = (fog_connectiion_info*)arg;
     evbuffer_add(user_data->buff, (char*)buf, size);
-    if (user_data->msgcb != NULL) {
-        user_data->msgcb(user_data);
+    if (user_data->on_receive != NULL) {
+        user_data->on_receive(user_data);
     }
 }
 
 
-static void pear_close_cb(void* connect, void* arg)
+static void fog_on_close(void* connect, void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
-    if (ud->closecb != NULL) {
-        ud->closecb(ud);
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    if (ud->on_close != NULL) {
+        ud->on_close(ud);
     }
-    pear_usr_data_free(ud);
+    fog_usr_data_free(ud);
 }
 
 
-pear_usr_data_t* pear_usr_data_new(pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb)
+static fog_connectiion_info* fog_usr_data_new(connect_cb on_connect, receive_cb on_receive, close_cb on_close)
 {
-    pear_usr_data_t* ret = (pear_usr_data_t*)malloc(sizeof(pear_usr_data_t));
-    // g_new(pear_usr_data_t, 1);
+    fog_connectiion_info* ret = (fog_connectiion_info*)malloc(sizeof(fog_connectiion_info));
+
     ret->pr_connect = NULL;
     ret->buff = evbuffer_new();
-    ret->closecb = clcb;
-    ret->conncb = ccb;
-    ret->msgcb = mcb;
+    ret->on_close = on_close;
+    ret->on_connect = on_connect;
+    ret->on_receive = on_receive;
     return ret;
 }
 
-void pear_set_callbacks(pear_usr_data_t* ud, pear_connecting_cb_p ccb, pear_message_callback_cb_p mcb, pear_close_cb_p clcb)
+
+void fog_set_callbacks(fog_connectiion_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close)
 {
-    ud->closecb = clcb;
-    ud->conncb = ccb;
-    ud->msgcb = mcb;
+    ud->on_close = on_close;
+    ud->on_connect = on_connect;
+    ud->on_receive = on_receive;
 }
 
-void pear_usr_data_free(void *arg)
+static void fog_usr_data_free(void *arg)
 {
     if (arg == NULL) return;
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     evbuffer_free(ud->buff);
     free(ud);
 }
 
-static int pear_connect_init(const char* server_id)
+void fog_exit()
 {
-    if (ctx != NULL) return 0;
-    ctx = pr_fogconnect_init();
-    if (ctx == NULL) return -1;
-    // set the id
-    set_id(server_id);
-    return 0;
+    if (ctx != NULL) fog_release(ctx);
 }
 
 
-void pear_connect_release()
+static void fog_signal_server_init()
 {
-    if (ctx != NULL) pr_fogconnect_release(ctx);
-}
+    fog_signal_server* signal_info = (fog_signal_server*)malloc(sizeof(fog_signal_server));
 
-
-static void pear_signal_init()
-{
-    struct pr_signal_server* signal_info = malloc(sizeof(struct pr_signal_server));
-    memset(signal_info, 0, sizeof(struct pr_signal_server));
     signal_info->ctx = ctx;
     signal_info->url = SIGNAL_SERVER_URL;
     signal_info->type = "/ws";
     signal_info->certificate = NULL;
     signal_info->privatekey = NULL;
     signal_info->port = 7600;
-    pr_init_signal(signal_info);
+
+    
+    fog_signal_init(signal_info);
 }
 
 
-static pear_connecting_cb_p g_ccb = NULL;
-static pear_message_callback_cb_p g_msb = NULL;
-static pear_close_cb_p g_closecb = NULL;
+static connect_cb g_on_connect = NULL;
+static receive_cb g_on_receive = NULL;
+static close_cb g_on_close = NULL;
 
-static void pear_callbacks(void* pr_connect, short events, void* arg)
+
+static void fog_on_event(void* pr_connect, short events, void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     switch (events) {
-        case PR_EVENT_CONNECTED: {
+        case FOG_EVENT_CONNECTED: {
             if (ud != NULL) {
                 ud->pr_connect = pr_connect;
-            } else if (pr_connect_is_passive(pr_connect)) {
+            } else if (fog_connect_is_passive(pr_connect)) {
                 // this fog node is connected by other fog node
-                ud = pear_usr_data_new(g_ccb, g_msb, g_closecb);
-                pr_connect_set_userdata(pr_connect, ud);
+                ud = fog_usr_data_new(g_on_connect, g_on_receive, g_on_close);
+                fog_set_userdata(pr_connect, ud);
                 ud->pr_connect = pr_connect;
             }
             // set the call back, for handle the msg between the fog nodes
-            pr_event_setcb(pr_connect, pear_msg_cb, pear_close_cb);
+            fog_event_setcb(pr_connect, fog_on_receive, fog_on_close);
             
             // connect callback
-            if (ud->conncb != NULL) {
-                ud->conncb(ud);
+            if (ud->on_connect != NULL) {
+                ud->on_connect(ud);
             }
             break;
         }
-        case PR_EVENT_EOF: 
-        case PR_EVENT_ERROR: 
-        case PR_EVENT_TIMEOUT: {
-            printf("connect fail!\n");
+        case FOG_EVENT_EOF: 
+        case FOG_EVENT_ERROR:
+        case FOG_EVENT_TIMEOUT:
+            fog_disconnect(pr_connect);
             break;
-        }
         default: break;
     }
 }
 
 
-void pear_set_up(const char* server_id_, pear_connecting_cb_p connect_cb_, pear_message_callback_cb_p message_cb_, pear_close_cb_p close_cb_)
+void fog_set_up(const char* server_id)
 {
-    pear_connect_init(server_id_);
-    pear_connect_set_callback(pear_callbacks, connect_cb_, message_cb_, close_cb_);
-    pear_signal_init();
+    ctx = fog_init();
+    set_id(server_id);
+    fog_connect_setcb(ctx, fog_on_event);
+    fog_signal_server_init();
 }
 
 
-static void pear_connect_set_callback(pear_callback_p cb, pear_connecting_cb_p ccb, pear_message_callback_cb_p msb, pear_close_cb_p closecb)
+void fog_service_set_callback(connect_cb on_connect, receive_cb on_receive, close_cb on_close)
 {
-    g_ccb = ccb;
-    g_msb = msb;
-    g_closecb = closecb;
-    pr_fogconnect_set_callback(ctx, cb);
+    g_on_connect = on_connect;
+    g_on_receive = on_receive;
+    g_on_close = on_close;
 }
 
 
-int pear_connect_peer(const char* id)
+int fog_connect_peer(const char* id, int protocol, connect_cb on_connect, receive_cb on_receive, close_cb on_close)
 {
-    pear_usr_data_t* ud = pear_usr_data_new(g_ccb, g_msb, g_closecb);
-    return pr_connect_peer(ctx, id, TRANSPORT_PROTOCOL, 1, pear_callbacks, ud);
+    fog_connectiion_info* ud = fog_usr_data_new(on_connect, on_receive, on_close);
+    return fog_connect(ctx, id, protocol, 1, fog_on_event, ud);
 }

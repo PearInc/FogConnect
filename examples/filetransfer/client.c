@@ -3,12 +3,19 @@
 #include <unistd.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #include "fogconnect.h"
 #include "pr_fog_connect.h"
 #include "ser.h"
 
 const char* g_file = NULL;
+
+pthread_mutex_t mutex;
+
+time_t start;
+time_t end;
+int64_t bytes_read;
 
 struct file_data {
     FILE* fp;
@@ -31,26 +38,29 @@ void on_connect(void* arg)
 {
     printf("connection_cb\n");
     char* msg = strdup("hello\r\n");
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
-    pr_send_peer(ud->pr_connect, msg, strlen(msg));
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_send_data(ud->pr_connect, msg, strlen(msg));
     free(msg);
     struct file_data* f = file_data_new();
     ud->context = (void*)f;
+    start = time(NULL);
 }
 
 void on_close(void* arg)
 {
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     fclose(f->fp);
+    bytes_read = f->length;
     free(f);
+    end = time(NULL);
+    pthread_mutex_unlock(&mutex);
 }
 
 
-void on_message(void* arg)
+void on_receive(void* arg)
 {
-    printf("msg cb\n");
-    pear_usr_data_t* ud = (pear_usr_data_t*)arg;
+    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
     struct file_data* f = (struct file_data*)ud->context;
     if (f->size == -1) {
         // get the file size
@@ -62,7 +72,7 @@ void on_message(void* arg)
     } else {
         size_t length = evbuffer_get_length(ud->buff);
         f->length += length;
-        printf("get the msg length is %ld of total %ld\n", f->length, f->size);
+        // printf("get the file %ld of total %ld\n", f->length, f->size);
 
         char* msg = (char*)malloc(length);
         evbuffer_remove(ud->buff, msg, length);
@@ -70,12 +80,10 @@ void on_message(void* arg)
         free(msg);
         if (r != 1) {
             printf("file write error\n");
-            close_cb(arg);
-            exit(-1);
+            on_close(arg);
         }
         if (f->length == f->size) {
-            close_cb(arg);
-            exit(0);
+            on_close(arg);
         }
     }
 }
@@ -88,14 +96,20 @@ int main(int argc, char* argv[])
     }
     g_file = argv[1];
 
-    pear_set_up("1e:34:a1:44:2c:2c", on_connect, on_message, on_close);
-    pear_connect_peer("1e:34:a1:44:2c:1c");
+    fog_set_up("1e:34:a1:44:2c:2c");
+    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive, on_close);
 
-    for (int i=0;i<100;i++) {
-        sleep(2);
-    }
-    pear_connect_release();
+    pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&mutex);
+    pthread_mutex_unlock(&mutex);
+    pthread_mutex_destroy(&mutex);
 
+    double seconds = (double)(end-start);
+    printf("seconds: %f\n", seconds);
+    double speed = (double)bytes_read/(1024*1024*seconds);
+    printf("\nthe speed is %f mb/s\n", speed);
+    fog_exit();
     return 0;
 }
 

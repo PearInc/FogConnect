@@ -11,8 +11,7 @@
 #include <glib.h>
 #include "fogconnect.h"
 
-
-struct pr_user_data 
+struct fog_usr_data 
 {
     void* pr_data;
     int    socket;
@@ -213,7 +212,7 @@ void pr_set_third_callback(void* pr_conn)
 
 void fog_connect_callback(void* pr_conn, short events, void* cb_arg)
 {
-    struct pr_user_data* arg = (cb_arg);
+    struct fog_usr_data* arg = (cbarg);
     switch (events)
     {
         case FOG_EVENT_CONNECTED:
@@ -225,8 +224,8 @@ void fog_connect_callback(void* pr_conn, short events, void* cb_arg)
                 pr_set_third_callback(pr_conn);
 /*
                 //表示当前雾节点，被其它雾节点发起了链接，当前雾节点为被动方。
-                struct pr_user_data* cb_arg_data = g_malloc0(sizeof(struct pr_user_data));
-                fog_set_userdata(pr_conn, cb_arg_data);
+                struct fog_usr_data* cbarg_data = g_malloc0(sizeof(struct fog_usr_data));
+                pr_connect_set_userdata(pr_connect, cbarg_data);
                 //保存链接信息以便其它过程使用。
                 cb_arg_data->pr_data = pr_conn;
 */              
