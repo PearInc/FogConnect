@@ -54,7 +54,7 @@ typedef struct {
 void fog_set_callbacks(fog_connectiion_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close);
 
 //------------------------------------------------------
-void fog_set_up(const char* server_id);
+void fog_setup(const char* server_id);
 
 void fog_service_set_callback(connect_cb on_connect, receive_cb on_receive, close_cb on_close);
 

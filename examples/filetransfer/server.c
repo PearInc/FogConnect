@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 {
     if (argc > 1) {
         g_file = argv[1];
-        fog_set_up("1e:34:a1:44:2c:1c");
+        fog_setup("1e:34:a1:44:2c:1c");
         fog_service_set_callback(on_connect, on_receive, on_close);
         getchar();
         fog_exit();

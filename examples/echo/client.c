@@ -42,7 +42,7 @@ void on_close(void* arg)
 
 int main()
 {
-    fog_set_up("1e:34:a1:44:2c:2c");
+    fog_setup("1e:34:a1:44:2c:2c");
     fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive, on_close);
     getchar();
     fog_exit();

@@ -122,7 +122,7 @@ static void fog_on_event(void* pr_connect, short events, void* arg)
 }
 
 
-void fog_set_up(const char* server_id)
+void fog_setup(const char* server_id)
 {
     ctx = fog_init();
     set_id(server_id);
