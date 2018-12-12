@@ -10,22 +10,20 @@
 #include "pr_fog_connect.h"
 #include "ser.h"
 
-const char* g_file = NULL;
+const char *g_file = NULL;
 
-void on_connect(void* arg)
-{
+void on_connect(void *arg) {
     printf("conn_cb\n");
-    fog_connection_info* ud = (fog_connection_info*)arg;
+    fog_connection_info *ud = (fog_connection_info *)arg;
 }
 
-void on_receive(void* arg)
-{
+void on_receive(void *arg) {
     printf("msg_cb and send the file %s\n", g_file);
-    fog_connection_info* ud = (fog_connection_info*)arg;
+    fog_connection_info *ud = (fog_connection_info *)arg;
 
-    FILE* fp;
-    char buf[8*1024];
-    if ((fp=fopen(g_file, "r")) == NULL) return;
+    FILE *fp;
+    char buf[8 * 1024];
+    if ((fp = fopen(g_file, "r")) == NULL) return;
 
     fseek(fp, 0L, SEEK_END);
     uint64_t size = ftell(fp);
@@ -35,19 +33,17 @@ void on_receive(void* arg)
     fog_send_data(ud->pr_connect, buf, 8);
 
     size_t n;
-    while((n=fread(buf, 1, sizeof(buf), fp)) != 0) {
+    while ((n = fread(buf, 1, sizeof(buf), fp)) != 0) {
         fog_send_data(ud->pr_connect, buf, n);
     }
     fclose(fp);
 }
 
-void on_close(void* arg)
-{
-    
+void on_close(void *arg) {
+
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
     if (argc > 1) {
         g_file = argv[1];
         fog_setup("1e:34:a1:44:2c:1c");

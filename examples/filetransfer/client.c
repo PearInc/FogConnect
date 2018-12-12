@@ -9,7 +9,7 @@
 #include "pr_fog_connect.h"
 #include "ser.h"
 
-const char* g_file = NULL;
+const char *g_file = NULL;
 
 pthread_mutex_t mutex;
 
@@ -18,38 +18,35 @@ time_t end;
 int64_t bytes_read;
 
 struct file_data {
-    FILE* fp;
+    FILE *fp;
     size_t size;
     uint64_t length;
 };
 
-struct file_data* file_data_new()
-{
-    struct file_data* f = (struct file_data*)malloc(sizeof(struct file_data));
+struct file_data *file_data_new() {
+    struct file_data *f = (struct file_data *)malloc(sizeof(struct file_data));
     f->size = -1;
     f->length = 0;
     f->fp = fopen(g_file, "w");
-    if (f->fp==NULL) exit(-1);
+    if (f->fp == NULL) exit(-1);
 
     return f;
 }
 
-void on_connect(void* arg)
-{
+void on_connect(void *arg) {
     printf("connection_cb\n");
-    char* msg = strdup("hello\r\n");
-    fog_connection_info* ud = (fog_connection_info*)arg;
+    char *msg = strdup("hello\r\n");
+    fog_connection_info *ud = (fog_connection_info *)arg;
     fog_send_data(ud->pr_connect, msg, strlen(msg));
     free(msg);
-    struct file_data* f = file_data_new();
-    ud->context = (void*)f;
+    struct file_data *f = file_data_new();
+    ud->context = (void *)f;
     start = time(NULL);
 }
 
-void on_close(void* arg)
-{
-    fog_connection_info* ud = (fog_connection_info*)arg;
-    struct file_data* f = (struct file_data*)ud->context;
+void on_close(void *arg) {
+    fog_connection_info *ud = (fog_connection_info *)arg;
+    struct file_data *f = (struct file_data *)ud->context;
     fclose(f->fp);
     bytes_read = f->length;
     free(f);
@@ -58,10 +55,9 @@ void on_close(void* arg)
 }
 
 
-void on_receive(void* arg)
-{
-    fog_connection_info* ud = (fog_connection_info*)arg;
-    struct file_data* f = (struct file_data*)ud->context;
+void on_receive(void *arg) {
+    fog_connection_info *ud = (fog_connection_info *)arg;
+    struct file_data *f = (struct file_data *)ud->context;
     if (f->size == -1) {
         // get the file size
         char buff[8];
@@ -74,9 +70,9 @@ void on_receive(void* arg)
         f->length += length;
         // printf("get the file %ld of total %ld\n", f->length, f->size);
 
-        char* msg = (char*)malloc(length);
+        char *msg = (char *)malloc(length);
         evbuffer_remove(ud->buff, msg, length);
-        int r = fwrite(msg, length, 1, f->fp); 
+        int r = fwrite(msg, length, 1, f->fp);
         free(msg);
         if (r != 1) {
             printf("file write error\n");
@@ -88,8 +84,7 @@ void on_receive(void* arg)
     }
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("arg is too less");
         return -1;
@@ -97,7 +92,8 @@ int main(int argc, char* argv[])
     g_file = argv[1];
 
     fog_setup("1e:34:a1:44:2c:2c");
-    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_QUIC, on_connect, on_receive, on_close);
+    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_QUIC, on_connect, on_receive,
+                     on_close);
 
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_lock(&mutex);
@@ -105,9 +101,9 @@ int main(int argc, char* argv[])
     pthread_mutex_unlock(&mutex);
     pthread_mutex_destroy(&mutex);
 
-    double seconds = (double)(end-start);
+    double seconds = (double)(end - start);
     printf("seconds: %f\n", seconds);
-    double speed = (double)bytes_read/(1024*1024*seconds);
+    double speed = (double)bytes_read / (1024 * 1024 * seconds);
     printf("\nthe speed is %f mb/s\n", speed);
     fog_exit();
     return 0;
