@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     g_file = argv[1];
 
     fog_setup("1e:34:a1:44:2c:2c");
-    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_QUIC, on_connect, on_receive,
+    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive,
                      on_close);
 
     pthread_mutex_init(&mutex, NULL);
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     double seconds = (double)(end - start);
     printf("seconds: %f\n", seconds);
     double speed = (double)bytes_read / (1024 * 1024 * seconds);
-    printf("\nthe speed is %f mb/s\n", speed);
+    printf("\nthe speed is %f MB/s\n", speed);
     fog_exit();
     return 0;
 }
