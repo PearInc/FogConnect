@@ -170,5 +170,5 @@ int main() {
 - 吴必磊(w@fog.hk)
     - 知名数据恢复软件Any Data Recovery Pro作者、反汇编与破解专家（同时也是不知名的健身教练）.
 
-- 陈荡漾(66@fog.hk)
+- 陈柳州(66@fog.hk)
     
