@@ -15,13 +15,13 @@ const char* g_file = NULL;
 void on_connect(void* arg)
 {
     printf("conn_cb\n");
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
 }
 
 void on_receive(void* arg)
 {
     printf("msg_cb and send the file %s\n", g_file);
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
 
     FILE* fp;
     char buf[8*1024];

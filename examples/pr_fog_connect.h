@@ -49,9 +49,9 @@ typedef struct {
 
     void* context;
     struct evbuffer* buff;
-} fog_connectiion_info;
+} fog_connection_info;
 
-void fog_set_callbacks(fog_connectiion_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close);
+void fog_set_callbacks(fog_connection_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close);
 
 //------------------------------------------------------
 void fog_setup(const char* server_id);

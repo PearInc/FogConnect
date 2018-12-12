@@ -94,7 +94,7 @@ void on_connect(void* arg)
 
 void on_receive(void* arg)
 {
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
@@ -133,7 +133,7 @@ int main()
 
 void on_connect(void* arg)
 {
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
     char* msg = strdup("hello\r\n");
     fog_send_data(ud->pr_connect, msg, strlen(msg));
     printf("sending: %s\n", msg);
@@ -142,7 +142,7 @@ void on_connect(void* arg)
 
 void on_receive(void* arg)
 {
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
     size_t len = 0;
     char* msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {

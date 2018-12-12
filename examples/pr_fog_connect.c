@@ -17,7 +17,7 @@ static void* ctx = NULL;
 static void fog_on_receive(void* pr_connect, void* arg, void* buf, int size)
 {
     if (size <= 0) return;
-    fog_connectiion_info* user_data = (fog_connectiion_info*)arg;
+    fog_connection_info* user_data = (fog_connection_info*)arg;
     evbuffer_add(user_data->buff, (char*)buf, size);
     if (user_data->on_receive != NULL) {
         user_data->on_receive(user_data);
@@ -27,7 +27,7 @@ static void fog_on_receive(void* pr_connect, void* arg, void* buf, int size)
 
 static void fog_on_close(void* connect, void* arg)
 {
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
     if (ud->on_close != NULL) {
         ud->on_close(ud);
     }
@@ -35,9 +35,9 @@ static void fog_on_close(void* connect, void* arg)
 }
 
 
-static fog_connectiion_info* fog_usr_data_new(connect_cb on_connect, receive_cb on_receive, close_cb on_close)
+static fog_connection_info* fog_usr_data_new(connect_cb on_connect, receive_cb on_receive, close_cb on_close)
 {
-    fog_connectiion_info* ret = (fog_connectiion_info*)malloc(sizeof(fog_connectiion_info));
+    fog_connection_info* ret = (fog_connection_info*)malloc(sizeof(fog_connection_info));
 
     ret->pr_connect = NULL;
     ret->buff = evbuffer_new();
@@ -48,7 +48,7 @@ static fog_connectiion_info* fog_usr_data_new(connect_cb on_connect, receive_cb 
 }
 
 
-void fog_set_callbacks(fog_connectiion_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close)
+void fog_set_callbacks(fog_connection_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close)
 {
     ud->on_close = on_close;
     ud->on_connect = on_connect;
@@ -58,7 +58,7 @@ void fog_set_callbacks(fog_connectiion_info* ud, connect_cb on_connect, receive_
 static void fog_usr_data_free(void *arg)
 {
     if (arg == NULL) return;
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
     evbuffer_free(ud->buff);
     free(ud);
 }
@@ -92,7 +92,7 @@ static close_cb g_on_close = NULL;
 
 static void fog_on_event(void* pr_connect, short events, void* arg)
 {
-    fog_connectiion_info* ud = (fog_connectiion_info*)arg;
+    fog_connection_info* ud = (fog_connection_info*)arg;
     switch (events) {
         case FOG_EVENT_CONNECTED: {
             if (ud != NULL) {
@@ -141,6 +141,6 @@ void fog_service_set_callback(connect_cb on_connect, receive_cb on_receive, clos
 
 int fog_connect_peer(const char* id, int protocol, connect_cb on_connect, receive_cb on_receive, close_cb on_close)
 {
-    fog_connectiion_info* ud = fog_usr_data_new(on_connect, on_receive, on_close);
+    fog_connection_info* ud = fog_usr_data_new(on_connect, on_receive, on_close);
     return fog_connect(ctx, id, protocol, 1, fog_on_event, ud);
 }
