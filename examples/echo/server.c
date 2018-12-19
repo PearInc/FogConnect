@@ -7,7 +7,7 @@
 #include "fogconnect.h"
 #include "pr_fog_connect.h"
 
-char CLRF[2] = "\r\n";
+char CRLF[2] = "\r\n";
 
 void on_connect(void *arg) {
 }
@@ -18,7 +18,7 @@ void on_receive(void *arg) {
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
         fog_send_data(ud->pr_connect, msg, len);
-        fog_send_data(ud->pr_connect, CLRF, sizeof(CLRF));
+        fog_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
         printf("sending: %s\n", msg);
         free(msg);
     }
