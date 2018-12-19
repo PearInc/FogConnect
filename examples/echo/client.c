@@ -24,17 +24,12 @@ void on_receive(void *arg) {
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
         printf("receiving: %s\n", msg);
-        char *return_msg = (char *)malloc(len + 1);
-        sprintf(return_msg, "%s\r\n", msg);
-        fog_send_data(ud->pr_connect, return_msg, strlen(return_msg));
-        printf("sending: %s\n", msg);
         free(msg);
-        free(return_msg);
+        fog_disconnect(ud->pr_connect);
     }
 }
 
 void on_close(void *arg) {
-    // call this function when the connection is closed
 }
 
 int main() {
