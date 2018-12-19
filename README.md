@@ -97,7 +97,6 @@ void on_receive(void *arg) {
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
-        printf("receiving %s\n", msg);
         fog_send_data(ud->pr_connect, msg, len);
         fog_send_data(ud->pr_connect, CLRF, 2);
         printf("sending: %s\n", msg);
