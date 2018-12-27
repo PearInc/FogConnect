@@ -72,10 +72,7 @@ make
 This example default use the QUIC protocol
 
 ## 性能测试
-
-![benchmark](doc/images/P2P建立连接时间.png) \
-[具体数据](doc/benchmark.md)
-
+平均P2P建立连接时间：1.2秒
 
 ### 系统环境
 Ubuntu 16.04.3 LTS \
