@@ -3,7 +3,7 @@
 FogConnet 是用于P2P网络中连接，调度，传输等功能于一体的组件。
 
 ### 架构图
-![fog_connectstack](./doc/images/fogconnectstack.png)
+![fog connect 架构图](./doc/images/fogconnectstack.png)
 
 ### 特性
 - 支持多种传输控制协议(QUIC, RTC, KCP, uTP, SCTP等)。
