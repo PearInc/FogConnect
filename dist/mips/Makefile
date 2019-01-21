@@ -1,3 +1,9 @@
+PATHWORK="/home/wulei/work/newifi"
+ARCH_CONFIG = -DNEWIFI_MT7621_OPENWRT
+CMPLEPATH:= $(PATHWORK)/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2
+export STAGING_DIR:=$(PATHWORK)/staging_dir/target-mipsel_1004kc+dsp_uClibc-0.9.33.2
+export CC:=$(CMPLEPATH)/bin/mipsel-openwrt-linux-gcc
+
 LDFLAGS := -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
 	-Wunused -fstrict-aliasing -Wextra -Wformat=2 -Winit-self -Winline \
 	-Wpacked -Wpointer-arith -Wmissing-format-attribute -Wmissing-noreturn \
@@ -12,11 +18,24 @@ LDFLAGS += -Wno-undef  				# sofiasip is not -Wundef--safe
 LDFLAGS += -Wno-redundant-decls  		# sofiasip also contains redundant declarations
 LDFLAGS += -Wno-override-init  			# we need this for JANUS_PLUGIN_INIT and JANUS_TRANSPORT_INIT
 
-CFLAGS += -g -O3 -fdata-sections -ffunction-sections -fno-stack-protector -std=gnu99 \
-	-fPIC -rdynamic -I../../../include -I/usr/include/glib-2.0\
-	-I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+CFLAGS += -O3 -fdata-sections -ffunction-sections -fno-stack-protector -std=gnu99 \
+-fPIC -rdynamic -I../../include \
+-I$(STAGING_DIR)/usr/include \
+-I$(STAGING_DIR)/usr/include/glib-2.0\
 
-LIBS := -L./ -lpthread  -lfogconnect -lfogquic  -lwebsockets -lcrypto -lssl -lusrsctp -lglib-2.0 -levent -ljansson
+LIBS := -Wl,--gc-sections -Wl,--strip-all -lpthread -lfogconnect -lfogquic -lcrypto -lssl\
+	-liconv -lintl -lz -lwebsockets -lusrsctp -lglib-2.0 -levent -ljansson 
+LDFLAGS += -L$(STAGING_DIR)/usr/lib/libiconv-full/lib\
+	-L$(STAGING_DIR)/usr/lib/libiconv-stub/lib\
+	-L$(STAGING_DIR)/usr/lib \
+	-L$(STAGING_DIR)/lib \
+	-L$(STAGING_DIR)/lib/libintl-full/lib \
+	-L$(STAGING_DIR)/root-ralink/usr/lib \
+	-L$(STAGING_DIR)/usr/lib/libintl-full/lib \
+	-L$(STAGING_DIR)/usr/lib/libintl-stub/lib \
+	-L$(STAGING_DIR)/usr/lib/python2.7\
+	-L./
+
 
 server_SRCS = pr_server.c
 server_OBJS = pr_server.o
@@ -29,6 +48,7 @@ test_server: $(server_OBJS)
 	$(CC)  $(LDFLAGS) -o $@ $^ $(LIBS)
 test_server.o: $(server_SRCS)
 	$(CC) $(CFLAGS) $@ -c $^
+
 
 test_client: $(client_OBJS)
 	$(CC)  $(LDFLAGS) -o $@ $^ $(LIBS)
