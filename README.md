@@ -3,11 +3,11 @@
 FogConnet 是用于P2P网络中连接，调度，传输等功能于一体的组件。
 
 ### 架构图
-![fog_connectstack](./doc/images/fogconnectstack.png)
+![fog connect 架构图](./doc/images/fogconnectstack.png)
 
 ### 特性
 - 支持多种传输控制协议(QUIC, RTC, KCP, uTP, SCTP等)。
-- 探测NAT类型，并收集和维护用于P2P连接的IP：PORT列表。
+- 探测NAT类型，并收集和维护用于P2P连接的IP:PORT列表。
 - 支持双向“打洞”和高级端口预测。
 - NAT类型最优匹配组合策略。
 - 连接控制与物理距离最近原则。
@@ -72,10 +72,7 @@ make
 This example default use the QUIC protocol
 
 ## 性能测试
-
-![benchmark](doc/images/P2P建立连接时间.png) \
-[具体数据](doc/benchmark.md)
-
+平均P2P建立连接时间：1.2秒
 
 ### 系统环境
 Ubuntu 16.04.3 LTS \
