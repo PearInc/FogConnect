@@ -6,15 +6,15 @@ FogConnet 是用于P2P网络中连接，调度，传输等功能于一体的组�
 ![fog connect 架构图](./doc/images/fogconnectstack.png)
 
 ### 特性
-- 支持多种传输控制协议(QUIC, RTC, KCP, uTP, SCTP等)。
-- 探测NAT类型，并收集和维护用于P2P连接的IP:PORT列表。
-- 支持双向“打洞”和高级端口预测。
-- NAT类型最优匹配组合策略。
-- 连接控制与物理距离最近原则。
-- 具有中继功能。
-- 所有网络信号采用事件机制处理。
-- 对资源消耗极少（一般运行状态下内存占用3～5M,峰值不超过50M）。
-- API简单，易懂，支持多种方式接入。
+- 支持多种传输控制协议(QUIC, RTC, KCP, uTP, SCTP等)
+- 探测NAT类型，并收集和维护用于P2P连接的IP:PORT列表
+- 支持双向“打洞“和高级端口预测
+- NAT类型最优匹配组合策略
+- 连接控制与物理距离最近原则
+- 具有中继功能
+- 所有网络信号采用事件机制处理
+- 对资源消耗极少（一般运行状态下内存占用3-5M,峰值不超过50M）
+- API简单，易懂，支持多种方式接入
 
 
 ## 快速开始
@@ -28,10 +28,10 @@ FogConnect depends on following packages:
 
 
 ## Supported Environment
-- Ubuntu/LinuxMint
+- Linux(e.g. Ubuntu, OpenWrt), Windows, MacOS, Android, iOS
 
 
-### Ubuntu/LinuxMint
+### For example, on Ubuntu/LinuxMint
 
 #### Prepare deps
 Install common deps:
