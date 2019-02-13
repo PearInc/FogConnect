@@ -108,14 +108,14 @@ int fog_connect_is_passive(void* conn_info);
     fog_get_convention_number: 获取双方约定数，以便处理相关过程。
     conn_info: 为连接后的连接对象。
     返回值：
-<<<<<<< HEAD
-   convention_n 各个位的定义。可以看出定义了的分部都是由fog_connect函数的相关参数
-   （int protocol, int use_service）来确定。
-   31    23    15    7     0
-=======
     convention_n 各个位的定义。可以看出定义了的分部都是由fog_connect函数的相关参数
    （int protocol, int use_service）来确定。
     31    23    15    7     0
+    |-----|-----|-----|-----|
+                  |     |-------------->低4位（0～3）表示双方约定的传输协议。
+                     |-------->8位(4~11)表示应用层自定定义的约定。
+    |----------->(12~31)未定义。
+*/
 unsigned int  fog_get_convention_number(void* conn_info);
 
 
@@ -149,45 +149,6 @@ void fog_set_userdata(void* conn_info, void* user_data);
 */
 void* fog_get_userdata(void* conn_info);
 
-
-/*
-    fog_get_uploadspeed: 获得一个连接的上传速度。
-    conn_info: 为连接后的连接对象。
-*/
-float fog_get_uploadspeed(void* conn_info);
-
-
-/*
-    fog_get_uploadspeed: 获得一个连接的下载速度。
-    conn_info: 为连接后的连接对象。
-*/
-float fog_get_downloadspeed(void* conn_info);
-
-/*
-    fog_get_uploadspeed: 获得一个连接的上传速度。
-    conn_info: 为连接后的连接对象。
-*/
-float fog_get_uploadspeed(void* conn_info);
-
-/*
-    fog_get_socket: 获得一个连接的socket.
-    conn_info: 为连接后的连接对象。
-*/
-int   fog_get_socket(void* conn_info);
-
-
-/*
-<<<<<<< HEAD
-    fog_get_remote_addr: 获得与peer通信的IP：PORT。
-    conn_info: 为连接后的连接对象。
-*/
-struct sockaddr_in* fog_get_remote_addr(void* conn_info);
-
-/*
-    fog_disconnect: 断开一个连接。
-    conn_info: 为连接后的连接对象。
-*/
-void fog_disconnect(void* conn_info);
 
 /*
     fog_get_socket: 获得一个连接的socket.
