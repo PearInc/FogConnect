@@ -66,7 +66,6 @@ sudo cp x86/linux/64/libfog* /usr/lib/x86_64-linux-gnu/
 make
 ./x86/linux/64/test_server && ./x86/linux/64/test_client
 ```
-This example default use the QUIC protocol
 
 ## 性能测试
 平均P2P建立连接时间：1.2秒
