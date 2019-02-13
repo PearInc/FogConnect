@@ -147,10 +147,6 @@ int main() {
 
 ```
 
-
-### 第三方协议无缝连接
-![third part connect](doc/images/third_part_connect.png)
-
 ### [更多例子](https://github.com/fogInc/FogConnect/tree/master/examples)
 
 ## 开发者简介
