@@ -24,17 +24,16 @@ typedef void  fog_connect_cb(void* conn_info, short events, void* cb_arg);
 typedef void  fog_recv_cb(void* conn_info, void* cb_arg, void* buf, int size);
 typedef void  fog_close_cb(void* conn_info, void* cb_arg);
 
-typedef struct fog_signal_server
-{
-    unsigned short  port;           /**< 服务器监听端口号。*/  
-    void* ctx;
-    char* url;                      /**< 服务器域名或IP。 */
-    char* type;                     /**< ‘/ws’或‘/wss’. */
-    const char* certificate;        /**< 证书路径。（可选）。*/
-    const char* privatekey;         /**< 私钥文件路径。（可选）。 */
-}fog_signal_server;
-
 struct fog_ctx;
+
+typedef struct fog_signal_server {
+    unsigned short  port;           /**< 服务器监听端口号。*/
+    char *url;                      /**< 服务器域名或IP。 */
+    char *path;                     /**< ‘/ws’或‘/wss’. */
+    const char *certificate;        /**< 证书路径。（可选）。*/
+    const char *privatekey;         /**< 私钥文件路径。（可选）。 */
+    struct fog_ctx  *ctx;
+} fog_signal_server;
 
 /*
     fog_signal_init: 链接信令服务器，返回0表示成功链接，1表示超时。
@@ -58,11 +57,11 @@ void   fog_release(struct fog_ctx* ctx);
 
 
 /*
-    fog_connect_setcb: 设置被动时的回调函数,主要是被连接端可以更具相关定义协议作出相关反映。
+    fog_passive_link_setcb: 设置被动连接时的回调函数。
     ctx: 为fog_init返回值。
     callback: 被连接后的处理过程。
 */
-void  fog_connect_setcb(struct fog_ctx* ctx, fog_connect_cb* callback);
+void  fog_passive_link_setcb(struct fog_ctx* ctx, fog_connect_cb* callback);
 
 
 /*
@@ -190,16 +189,6 @@ struct sockaddr_in* fog_get_remote_addr(void* conn_info);
 */
 void fog_disconnect(void* conn_info);
 
-
-/*
-*/
-void fog_lock(void* conn_info);
-
-
-/*
-*/
-void fog_unlock(void* conn_info);
-
 /*
     fog_get_socket: 获得一个连接的socket.
     conn_info: 为连接后的连接对象。
@@ -219,16 +208,6 @@ struct sockaddr_in* fog_get_remote_addr(void* conn_info);
     conn_info: 为连接后的连接对象。
 */
 void fog_disconnect(void* conn_info);
-
-
-/*
-*/
-void fog_lock(void* conn_info);
-
-
-/*
-*/
-void fog_unlock(void* conn_info);
 
 
 /*
