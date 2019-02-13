@@ -70,7 +70,7 @@ static void fog_signal_server_init() {
 
     signal_info->ctx = ctx;
     signal_info->url = SIGNAL_SERVER_URL;
-    signal_info->type = "/ws";
+    signal_info->path = "/ws";
     signal_info->certificate = NULL;
     signal_info->privatekey = NULL;
     signal_info->port = 7600;
@@ -120,7 +120,7 @@ static void fog_on_event(void *pr_connect, short events, void *arg) {
 void fog_setup(const char *server_id) {
     ctx = fog_init();
     set_id(server_id);
-    fog_connect_setcb(ctx, fog_on_event);
+    fog_passive_link_setcb(ctx, fog_on_event);
     fog_signal_server_init();
 }
 
