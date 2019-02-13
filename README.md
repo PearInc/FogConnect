@@ -20,10 +20,14 @@ FogConnect depends on following packages:
 - [openssl](https://www.cnblogs.com/emanlee/p/6100019.html)
 - [libwebsockets.so.10](https://libwebsockets.org/)
 - [libjansson.so.4](https://github.com/akheron/jansson)
-- [libusrsctp.so.1](https://github.com/sctplab/usrsctp)
 - [libevent-2.0.so.5](https://github.com/libevent/libevent)
 - [libglib-2.0.so.0](https://github.com/GNOME/glib)
 
+Additionally, you'll need the following libraries and tools:
+- [libusrsctp.so.1](https://github.com/sctplab/usrsctp)
+- [git](https://github.com/sctplab/usrsctp)
+- [g++](https://github.com/sctplab/usrsctp)
+- [cmake](https://github.com/sctplab/usrsctp)
 
 ## Supported Environment
 - Linux(e.g. Ubuntu, OpenWrt), Windows, MacOS, Android, iOS
@@ -34,7 +38,7 @@ FogConnect depends on following packages:
 Install common deps:
 
 ``` shell
-sudo apt-get install git g++ make 
+sudo apt-get install git g++ make cmake
 ```
 
 Install dependencies:
