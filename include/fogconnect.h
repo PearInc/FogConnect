@@ -131,22 +131,6 @@ void fog_set_userdata(void* conn_info, void* user_data);
     fog_get_userdata: 获得连接时，设置用户私有数据。
     conn_info: 为连接后的连接对象。
 */
-
-unsigned int  fog_get_convention_number(void* conn_info);
-
-
-/*
-    fog_set_userdata: 连接时，设置用户私有数据。
-    conn_info: 为连接后的连接对象。
-    user_data: 用户私有数据指针。
-*/
-void fog_set_userdata(void* conn_info, void* user_data);
-
-
-/*
-    fog_get_userdata: 获得连接时，设置用户私有数据。
-    conn_info: 为连接后的连接对象。
-*/
 void* fog_get_userdata(void* conn_info);
 
 
