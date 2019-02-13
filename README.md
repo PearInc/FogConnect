@@ -148,7 +148,7 @@ int main() {
 
 ```
 
-### [更多例子](https://github.com/fogInc/FogConnect/tree/master/examples)
+### [更多例子](https://github.com/PearInc/FogConnect/tree/master/examples)
 
 ## 开发者简介
 - 吴必磊(w@pear.hk)
