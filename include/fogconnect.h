@@ -28,11 +28,11 @@ struct fog_ctx;
 
 typedef struct fog_signal_server {
     unsigned short  port;           /**< 服务器监听端口号。*/
-    char *url;                      /**< 服务器域名或IP。 */
-    char *path;                     /**< ‘/ws’或‘/wss’. */
-    const char *certificate;        /**< 证书路径。（可选）。*/
-    const char *privatekey;         /**< 私钥文件路径。（可选）。 */
-    struct fog_ctx  *ctx;
+    char* url;                      /**< 服务器域名或IP。 */
+    char* path;                     /**< ‘/ws’或‘/wss’. */
+    const char* certificate;        /**< 证书路径。（可选）。*/
+    const char* privatekey;         /**< 私钥文件路径。（可选）。 */
+    struct fog_ctx* ctx;
 } fog_signal_server;
 
 /*
