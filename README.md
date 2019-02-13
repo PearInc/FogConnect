@@ -6,7 +6,7 @@ FogConnet 是用于P2P网络中连接、调度、传输等功能于一体的组�
 ![fog connect 架构图](./doc/images/fogconnectstack.png)
 
 ### 特性
-- 支持多种传输控制协议（QUIC、RTC、KCP、uTP、SCTP等）
+- 支持多种传输控制协议（UDP、QUIC、RTC、KCP、uTP、SCTP等）
 - 探测NAT类型，并收集和维护用于P2P连接的`<IP:Port>`列表
 - 支持双向 “打洞” 和高级端口预测
 - NAT类型最优匹配组合策略
