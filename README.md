@@ -25,9 +25,7 @@ FogConnect depends on following packages:
 
 Additionally, you'll need the following libraries and tools:
 - [libusrsctp.so.1](https://github.com/sctplab/usrsctp)
-- [git](https://github.com/sctplab/usrsctp)
-- [g++](https://github.com/sctplab/usrsctp)
-- [cmake](https://github.com/sctplab/usrsctp)
+- [cmake](https://github.com/Kitware/CMake)
 
 ## Supported Environment
 - Linux(e.g. Ubuntu, OpenWrt), Windows, MacOS, Android, iOS
