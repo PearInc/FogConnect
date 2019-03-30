@@ -23,10 +23,6 @@ FogConnect depends on following packages:
 - [libevent-2.0.so.5](https://github.com/libevent/libevent)
 
 
-Additionally, you'll need the following libraries and tools:
-- [libusrsctp.so.1](https://github.com/sctplab/usrsctp)
-
-
 ## Supported Environment
 - Linux(e.g. Ubuntu, OpenWrt), Windows, MacOS, Android, iOS
 
@@ -43,16 +39,6 @@ Install dependencies:
 
 ``` shell
 sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev libevent-dev
-```
-
-Install libusrsctp:
-``` shell
-git clone https://github.com/sctplab/usrsctp.git
-cd usrsctp/
-cmake .
-make
-sudo cp usrsctplib/libusrsctp.so* /usr/lib/x86_64-linux-gnu/
-sudo cp usrsctplib/libusrsctp.a /usr/lib/x86_64-linux-gnu/
 ```
 
 ##### Build and run examples
