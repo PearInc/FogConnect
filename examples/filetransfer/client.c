@@ -6,7 +6,7 @@
 #include <pthread.h>
 
 #include "fogconnect.h"
-#include "pr_fog_connect.h"
+#include "fog_connect.h"
 #include "ser.h"
 
 const char *g_file = NULL;
@@ -55,7 +55,7 @@ void on_close(void *arg) {
 }
 
 
-void on_receive(void *arg) {
+void on_recv(void *arg) {
     fog_connection_info *ud = (fog_connection_info *)arg;
     struct file_data *f = (struct file_data *)ud->context;
     if (f->size == -1) {
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     g_file = argv[1];
 
     fog_setup("1e:34:a1:44:2c:2c");
-    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive,
+    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_recv,
                      on_close);
 
     pthread_mutex_init(&mutex, NULL);

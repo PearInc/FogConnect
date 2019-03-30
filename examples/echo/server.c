@@ -5,14 +5,14 @@
 #include <malloc.h>
 
 #include "fogconnect.h"
-#include "pr_fog_connect.h"
+#include "fog_connect.h"
 
 char CRLF[2] = "\r\n";
 
 void on_connect(void *arg) {
 }
 
-void on_receive(void *arg) {
+void on_recv(void *arg) {
     fog_connection_info *ud = (fog_connection_info *)arg;
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
@@ -29,7 +29,7 @@ void on_close(void *arg) {
 
 int main() {
     fog_setup("**:**:**:**:**:1c");
-    fog_service_set_callback(on_connect, on_receive, on_close);
+    fog_service_set_callback(on_connect, on_recv, on_close);
     getchar();
     fog_exit();
     return 0;

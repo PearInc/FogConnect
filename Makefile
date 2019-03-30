@@ -1,20 +1,12 @@
-all : x68_linux_64  mips
+all : x68_linux_64
 
-.PHONY : x68_linux_64 mips
+.PHONY : x68_linux_64
 
 x68_linux_64:
-	make -C ./x86/linux/64
-
-mips:
-	make -C ./mips
+	make -C ./examples
 
 .PHONY : clean
 
 clean :
-	make -C ././x86/linux/64 clean
-	make -C ./mips clean
-
-
-
-
+	make -C ./examples clean
 

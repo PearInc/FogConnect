@@ -21,11 +21,11 @@ FogConnect depends on following packages:
 - [libwebsockets.so.10](https://libwebsockets.org/)
 - [libjansson.so.4](https://github.com/akheron/jansson)
 - [libevent-2.0.so.5](https://github.com/libevent/libevent)
-- [libglib-2.0.so.0](https://github.com/GNOME/glib)
+
 
 Additionally, you'll need the following libraries and tools:
 - [libusrsctp.so.1](https://github.com/sctplab/usrsctp)
-- [cmake](https://github.com/Kitware/CMake)
+
 
 ## Supported Environment
 - Linux(e.g. Ubuntu, OpenWrt), Windows, MacOS, Android, iOS
@@ -36,13 +36,13 @@ Additionally, you'll need the following libraries and tools:
 Install common deps:
 
 ``` shell
-sudo apt-get install git g++ make cmake
+sudo apt-get install git make
 ```
 
 Install dependencies:
 
 ``` shell
-sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev libevent-dev libglib2.0-dev 
+sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev libevent-dev
 ```
 
 Install libusrsctp:
@@ -54,19 +54,10 @@ make
 sudo cp usrsctplib/libusrsctp.so* /usr/lib/x86_64-linux-gnu/
 sudo cp usrsctplib/libusrsctp.a /usr/lib/x86_64-linux-gnu/
 ```
-#### Compile FogConnect
-##### Prepare the FogConnect env
-``` shell
-git clone git@github.com:fogInc/FogConnect.git
-cd FogConnect
-sudo cp include/fogconnect.h /usr/include/
-sudo cp x86/linux/64/libfog* /usr/lib/x86_64-linux-gnu/
-```
 
 ##### Build and run examples
 ``` shell
 make
-./x86/linux/64/test_server && ./x86/linux/64/test_client
 ```
 
 ## 性能测试
@@ -80,14 +71,14 @@ Mem: 7840 MB
 
 ### Echo server
 ```C
-#include "pr_fog_connect.h"
+#include "fog_connect.h"
 
 char CRLF[2] = "\r\n";
 
 void on_connect(void *arg) {
 }
 
-void on_receive(void *arg) {
+void on_recv(void *arg) {
     fog_connection_info *ud = (fog_connection_info *)arg;
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
@@ -104,7 +95,7 @@ void on_close(void *arg) {
 
 int main() {
     fog_setup("**:**:**:**:**:1c");
-    fog_service_set_callback(on_connect, on_receive, on_close);
+    fog_service_set_callback(on_connect, on_recv, on_close);
     getchar();
     fog_exit();
     return 0;
@@ -114,7 +105,7 @@ int main() {
 ### Client
 
 ```C
-#include "pr_fog_connect.h"
+#include "fog_connect.h"
 
 void on_connect(void *arg) {
     fog_connection_info *ud = (fog_connection_info *)arg;
@@ -124,14 +115,14 @@ void on_connect(void *arg) {
     free(msg);
 }
 
-void on_receive(void *arg) {
+void on_recv(void *arg) {
     fog_connection_info *ud = (fog_connection_info *)arg;
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
         printf("receiving: %s\n", msg);
         free(msg);
-        fog_disconnect(ud->pr_connect);
+        fog_connect_disconnect(ud->pr_connect);
     }
 }
 
@@ -140,15 +131,13 @@ void on_close(void *arg) {
 
 int main() {
     fog_setup("**:**:**:**:**:2c");
-    fog_connect_peer("**:**:**:**:**:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_receive, on_close);
+    fog_connect_peer("**:**:**:**:**:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_recv, on_close);
     getchar();
     fog_exit();
     return 0;
 }
 
 ```
-
-### [更多例子](https://github.com/PearInc/FogConnect/tree/master/examples)
 
 ## 开发者简介
 - 吴必磊(w@pear.hk)

@@ -204,5 +204,5 @@ void fog_free(void* buf);
 /*
     给节点设一个id.
 */
-void fog_set_id(const char *id);
+void fog_fog_set_id(const char *id);
 #endif

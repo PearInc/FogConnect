@@ -44,24 +44,24 @@ typedef struct {
     void* pr_connect;
 
     connect_cb on_connect;
-    receive_cb on_receive;
+    receive_cb on_recv;
     close_cb on_close;
 
     void* context;
     struct evbuffer* buff;
 } fog_connection_info;
 
-void fog_set_callbacks(fog_connection_info* ud, connect_cb on_connect, receive_cb on_receive, close_cb on_close);
+void fog_set_callbacks(fog_connection_info* ud, connect_cb on_connect, receive_cb on_recv, close_cb on_close);
 
 //------------------------------------------------------
 void fog_setup(const char* server_id);
 
-void fog_service_set_callback(connect_cb on_connect, receive_cb on_receive, close_cb on_close);
+void fog_service_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close);
 
 void fog_exit();
 
 // for the client part
 
-int fog_connect_peer(const char* id, int protocol, connect_cb on_connect, receive_cb on_receive, close_cb on_close);
+int fog_connect_peer(const char* id, int protocol, connect_cb on_connect, receive_cb on_recv, close_cb on_close);
 
 #endif // !PR_FOG_CONNECT_H
