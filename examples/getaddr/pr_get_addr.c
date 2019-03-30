@@ -1,11 +1,5 @@
-#include <event.h>
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <event2/thread.h>
-#include <event2/buffer.h>
-#include <event2/util.h>
-
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/resource.h>
@@ -27,37 +21,36 @@ struct pr_user_data
 void fog_connect_callback(void* pr_conn, short events, void* cb_arg) {
     struct sockaddr_in  *tmp_remote;
     struct sockaddr_in  *tmp_local;
-
     struct pr_user_data* arg = (cb_arg);
     switch (events) {
         case FOG_EVENT_CONNECTED:
-            if (!arg || fog_connect_is_passive(pr_conn)) {
+            if (!arg) {
                 arg = fog_malloc(sizeof(struct pr_user_data));
-                if (arg == NULL) {
-                    fog_disconnect(pr_conn);
-                    return;
-                }
+                if (arg == NULL) {fog_connect_disconnect(pr_conn); return;}
             }
-
-            arg->socket = fog_get_socket(pr_conn);
-            tmp_remote = fog_get_remote_addr(pr_conn);
+            arg->socket = fog_get_connect_socket(pr_conn);
+            tmp_remote = fog_get_connect_remote_addr(pr_conn);
             if (tmp_remote) memcpy(&arg->remote_addr, tmp_remote, sizeof(struct sockaddr_in));
-            tmp_local  = fog_get_local_addr(pr_conn);
+            tmp_local  = fog_get_connect_local_addr(pr_conn);
             if (tmp_local) memcpy(&arg->local_addr, tmp_local, sizeof(struct sockaddr_in));
+            //标记本次连接，在调用fog_connect_disconnect后仅仅只是脱离fogconnect的控制。
             fog_connect_set_separate(pr_conn);
-            fog_disconnect(pr_conn);
-#if 1
-            printf( "connect info: %s:%d ------->",
-            inet_ntoa(arg->local_addr.sin_addr), htons(arg->local_addr.sin_port));
-            printf("%s:%d\n",inet_ntoa(arg->remote_addr.sin_addr), htons(arg->remote_addr.sin_port));
-            if (arg) fog_free(arg);
-#endif
+            fog_connect_disconnect(pr_conn);
+            /*
+                在这里处理获取的连接信息。
+                arg->socket(本次连接的套接字), 
+                arg->local_addr(本次连接的local ip:port), 
+                arg->remote_addr(本次连接的remote ip:port), 
+                可以在程序中任意使用，协议为UDP.
+            */
+            //如想在其它地方，使用本次连接信息来通信，这不需要释放和关闭套接字。
+            if (arg) fog_free(arg);     
             if (arg->socket != -1) close(arg->socket);
             break;
         case FOG_EVENT_EOF:
         case FOG_EVENT_ERROR:
         case FOG_EVENT_TIMEOUT:
-            fog_disconnect(pr_conn);
+            fog_connect_disconnect(pr_conn);
             break;
         default:
             break;
@@ -132,25 +125,17 @@ int  fog_get_mac(char* mac_address) {
 }
 
 int main(int argc, char *argv[]) {
-    int count = 100;
-
-    struct rlimit core_limits;
-	core_limits.rlim_cur = core_limits.rlim_max = RLIM_INFINITY;
-	setrlimit(RLIMIT_CORE, &core_limits);
-
     //初始化fogconnect组件。
-    void* ctx = fog_init();
+    void* ctx = fog_connect_init();
     if (!ctx) return 0;
 
     //测试时，设置的ID，这么为MAC地址。
-    //set_id("ee:34:a1:44:1c:1c");
+    //fog_set_id("ee:34:a1:44:1c:1c");
     fog_get_mac(g_mac_buf);
-    set_id(g_mac_buf);
+    fog_set_id(g_mac_buf);
 
     //设置被动时的回调函数。
     fog_passive_link_setcb(ctx, fog_connect_callback);
-    printf("ctx = %p\n", ctx);
-
     //以下以连接信令服务器的操作。
     struct fog_signal_server* signal_info = malloc(sizeof(struct fog_signal_server));
     signal_info->ctx  = ctx;
@@ -158,21 +143,14 @@ int main(int argc, char *argv[]) {
     fog_signal_init(signal_info);
 
     if ( argc > 1 ) {
-        usleep(100000);
         //以下为主动对雾节点发起的链接。
         //UDP protocol
         void* user_data = fog_malloc(sizeof(struct pr_user_data));
-        int pr_udp = fog_connect(ctx, argv[1],
-                               FOG_TRANSPORT_PROTOCOL_UDP,
-                               0, //注意这个参数，与服务的选择相关联。请看pr_set_third_callback函数的处理。
-                               fog_connect_callback, user_data);
-    
+        int pr_udp = fog_connect(ctx, argv[1], FOG_TRANSPORT_PROTOCOL_UDP,
+                               0, fog_connect_callback, user_data);
     }
-    //printf("Please press any key to exit... \n");
-	while(1){
-        usleep(1000);
-    }
-    
-    fog_release(ctx);
+
+    printf("Please press any key to exit... \n");
+    fog_connect_release(ctx);
     return 0;
 }
