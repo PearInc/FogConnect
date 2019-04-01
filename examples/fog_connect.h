@@ -56,7 +56,7 @@ void fc_set_callbacks(fc_info* ud, connect_cb on_connect, receive_cb on_recv, cl
 //------------------------------------------------------
 void fc_setup(const char* server_id);
 
-void fc_service_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close);
+void fc_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close);
 
 void fc_exit();
 

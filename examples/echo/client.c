@@ -13,7 +13,7 @@
 void on_connect(void *arg) {
     fc_info *ud = (fc_info *)arg;
     char *msg = strdup("hello\r\n");
-    fc_send_data(ud->pr_connect, msg, strlen(msg));
+    fc_send(ud->pr_connect, msg, strlen(msg));
     printf("sending: %s\n", msg);
     fc_free(msg);
 }

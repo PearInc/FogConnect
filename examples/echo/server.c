@@ -17,8 +17,8 @@ void on_recv(void *arg) {
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
-        fc_send_data(ud->pr_connect, msg, len);
-        fc_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
+        fc_send(ud->pr_connect, msg, len);
+        fc_send(ud->pr_connect, CRLF, sizeof(CRLF));
         printf("sending: %s\n", msg);
         fc_free(msg);
     }
@@ -29,7 +29,7 @@ void on_close(void *arg) {
 
 int main() {
     fc_setup("**:**:**:**:**:1c");
-    fc_service_set_callback(on_connect, on_recv, on_close);
+    fc_set_callback(on_connect, on_recv, on_close);
     getchar();
     fc_exit();
     return 0;

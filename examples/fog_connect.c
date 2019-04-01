@@ -125,7 +125,7 @@ void fc_setup(const char *server_id) {
 }
 
 
-void fc_service_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close) {
+void fc_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close) {
     g_on_connect = on_connect;
     g_on_recv = on_recv;
     g_on_close = on_close;

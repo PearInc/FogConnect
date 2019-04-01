@@ -86,12 +86,12 @@ int  fc_event_setcb(void *conn_info, fc_recv_cb *recv, fc_close_cb *close);
 
 
 /*
-    fc_send_data: 向雾节点发送数据。
+    fc_send: 向雾节点发送数据。
     conn_info: 为连接后的连接对象。
     buf: 待传输的缓存。
     size: 缓存数据大小。
 */
-int  fc_send_data(void *conn_info, void *buf, int size);
+int  fc_send(void *conn_info, void *buf, int size);
 
 
 /*

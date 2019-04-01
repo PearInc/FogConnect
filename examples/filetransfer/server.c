@@ -30,11 +30,11 @@ void on_recv(void *arg) {
     fseek(fp, 0L, SEEK_SET);
     memset(buf, 0, 8);
     ser_writedata64(size, buf);
-    fc_send_data(ud->pr_connect, buf, 8);
+    fc_send(ud->pr_connect, buf, 8);
 
     size_t n;
     while ((n = fread(buf, 1, sizeof(buf), fp)) != 0) {
-        fc_send_data(ud->pr_connect, buf, n);
+        fc_send(ud->pr_connect, buf, n);
     }
     fclose(fp);
 }
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     if (argc > 1) {
         g_file = argv[1];
         fc_setup("1e:34:a1:44:2c:1c");
-        fc_service_set_callback(on_connect, on_recv, on_close);
+        fc_set_callback(on_connect, on_recv, on_close);
         getchar();
         fc_exit();
     } else {
