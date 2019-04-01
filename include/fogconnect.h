@@ -1,14 +1,14 @@
 #ifndef FOGCONNECT_H
 #define FOGCONNECT_H
 
-typedef enum fog_transport_protocol {
+typedef enum fc_transport_protocol {
     FOG_TRANSPORT_PROTOCOL_RTC = 0,
     FOG_TRANSPORT_PROTOCOL_UDP = 1,
     FOG_TRANSPORT_PROTOCOL_UTP,
     FOG_TRANSPORT_PROTOCOL_KCP,
     FOG_TRANSPORT_PROTOCOL_SCTP,
     FOG_TRANSPORT_PROTOCOL_QUIC,
-} fog_transport_protocol;
+} fc_transport_protocol;
 #define FOG_TRANSPORT_PROTOCOL_DATACHANNEL	FOG_TRANSPORT_PROTOCOL_RTC
 
 #define FOG_EVENT_EOF		    0x10	/**< eof file reached. */
@@ -17,96 +17,96 @@ typedef enum fog_transport_protocol {
 #define FOG_EVENT_CONNECTED	    0x80	/**< connect operation finished. */
 #define FOG_EVENT_DISCONNECT	0x100	/**< peer disconnect. */
 
-typedef void  fog_connect_cb(void *conn_info, unsigned short events, void *cb_arg);
-typedef void  fog_recv_cb(void *conn_info, void *cb_arg, void *buf, int size);
-typedef void  fog_close_cb(void *conn_info, void *cb_arg);
+typedef void  fc_connect_cb(void *conn_info, unsigned short events, void *cb_arg);
+typedef void  fc_recv_cb(void *conn_info, void *cb_arg, void *buf, int size);
+typedef void  fc_close_cb(void *conn_info, void *cb_arg);
 
-struct fog_connects_ctx;   //struct fog_connects_ctx
+struct fc_ctx;   //struct fc_ctx
 
-typedef struct fog_signal_server {
+typedef struct fc_signal_server {
     unsigned short  port;           /**< 服务器监听端口号。*/
     char *url;                      /**< 服务器域名或IP。 */
     char *path;                     /**< ‘/ws’或‘/wss’. */
     const char *certificate;        /**< 证书路径。（可选）。*/
     const char *privatekey;         /**< 私钥文件路径。（可选）。 */
-    struct fog_connects_ctx  *ctx;
-} fog_signal_server;
+    struct fc_ctx  *ctx;
+} fc_signal_server;
 
 /*
-    fog_signal_init: 链接信令服务器，返回0表示成功链接，1表示超时。
-    参数请具体看struct fog_signal_server.
+    fc_signal_init: 链接信令服务器，返回0表示成功链接，1表示超时。
+    参数请具体看struct fc_signal_server.
 */
-int    fog_signal_init(struct fog_signal_server *info);
+int    fc_signal_init(struct fc_signal_server *info);
 
 
 /*
-    fog_connect_init: 初始化FogConnect.
+    fc_init: 初始化FogConnect.
     返回非NULL表示成功，失败为NULL.
 */
-struct fog_connects_ctx  *fog_connect_init(void);  //fog_connect_init
+struct fc_ctx  *fc_init(void);
 
 
 /*
-    fog_connect_release: 退出fogconnect.
-    参数为: fog_connect_init的返回值。
+    fc_release: 退出fogconnect.
+    参数为: fc_init的返回值。
 */
-void   fog_connect_release(struct fog_connects_ctx *ctx); //fog_connect_release
+void   fc_release(struct fc_ctx *ctx);
 
 
 /*
-    fog_passive_link_setcb: 设置被动连接时的回调函数。
-    ctx: 为fog_connect_init返回值。
+    fc_passive_link_setcb: 设置被动连接时的回调函数。
+    ctx: 为fc_init返回值。
     callback: 被连接后的处理过程。
 */
-//void  fog_connect_setcb(struct fog_connects_ctx *ctx, fog_connect_cb *callback);
-void  fog_passive_link_setcb(struct fog_connects_ctx *ctx, fog_connect_cb *callback);
+//void  fc_connect_setcb(struct fc_ctx *ctx, fc_connect_cb *callback);
+void  fc_passive_link_setcb(struct fc_ctx *ctx, fc_connect_cb *callback);
 
 
 /*
-    fog_connect: 雾节点建立P2P连接。
-    ctx: 为fog_connect_init返回值。
+    fc_connect: 雾节点建立P2P连接。
+    ctx: 为fc_init返回值。
     by_id: 信息由调度服务器返回，测试阶段可以写为对端的mac地址。
     tansport_protocol: 具体看enum tansport_protocol，这里确认本次连接后，数据传输使用的传输协议。
     use_service: 主动连接端，过通这个参数通知用户层处理的具体服务（主要是被连接端能执行指定的服务过程，默认为0）。
     conn_callback: 当P2P连接后，内部就会调用用户层回调函数来处理。
     cb_arg: 用户层私有数据。
-    注：在回调函数被调用时需要保存相关的信息。具体看fog_send_data，fog_event_connect_setcb函数需要使用的参数。
+    注：在回调函数被调用时需要保存相关的信息。具体看fc_send_data，fc_event_setcb函数需要使用的参数。
 */
-int  fog_connect(struct fog_connects_ctx *ctx, const char *by_id, fog_transport_protocol protocol,
-                 int use_service, fog_connect_cb *conn_callback, void *cb_arg);
+int  fc_connect(struct fc_ctx *ctx, const char *by_id, fc_transport_protocol protocol,
+                 int use_service, fc_connect_cb *conn_callback, void *cb_arg);
 
 
 /*
-    fog_event_connect_setcb: 设置回调函数。
+    fc_event_setcb: 设置回调函数。
     conn_info: 为连接后的连接对象。
     recv：传输层受到数据后，调用应用层的数据处理函数（被动调用）。
     close:当连接断开，或超时将调用（被动调用）。
 */
-int  fog_event_connect_setcb(void *conn_info, fog_recv_cb *recv, fog_close_cb *close);
+int  fc_event_setcb(void *conn_info, fc_recv_cb *recv, fc_close_cb *close);
 
 
 /*
-    fog_send_data: 向雾节点发送数据。
+    fc_send_data: 向雾节点发送数据。
     conn_info: 为连接后的连接对象。
     buf: 待传输的缓存。
     size: 缓存数据大小。
 */
-int  fog_send_data(void *conn_info, void *buf, int size);
+int  fc_send_data(void *conn_info, void *buf, int size);
 
 
 /*
-    fog_connect_is_passive: 判断节点连接的主/被动方式。
+    fc_is_passive: 判断节点连接的主/被动方式。
     conn_info: 为连接后的连接对象。
     返回值：     0表示主动发起链接，1表示被动被连接。
 */
-int fog_connect_is_passive(void *conn_info);
+int fc_is_passive(void *conn_info);
 
 
 /*
-    fog_get_connect_convention_number: 获取双方约定数，以便处理相关过程。
+    fc_get_convention_number: 获取双方约定数，以便处理相关过程。
     conn_info: 为连接后的连接对象。
     返回值：
-    convention_n 各个位的定义。可以看出定义了的分部都是由fog_connect函数的相关参数
+    convention_n 各个位的定义。可以看出定义了的分部都是由fc_connect函数的相关参数
    （int protocol, int use_service）来确定。
     31    23    15    7     0
     |-----|-----|-----|-----|
@@ -114,95 +114,95 @@ int fog_connect_is_passive(void *conn_info);
                      |-------->8位(4~11)表示应用层自定定义的约定。
     |----------->(12~31)未定义。
 */
-unsigned int  fog_get_connect_convention_number(void *conn_info);
+unsigned int  fc_get_convention_number(void *conn_info);
 
 
 /*
-    fog_set_connect_userdata: 连接时，设置用户私有数据。
+    fc_set_userdata: 连接时，设置用户私有数据。
     conn_info: 为连接后的连接对象。
     user_data: 用户私有数据指针。
 */
-void fog_set_connect_userdata(void *conn_info, void *user_data);
+void fc_set_userdata(void *conn_info, void *user_data);
 
 
 /*
-    fog_get_connect_userdata: 获得连接时，设置用户私有数据。
+    fc_get_userdata: 获得连接时，设置用户私有数据。
     conn_info: 为连接后的连接对象。
 */
-void *fog_get_connect_userdata(void *conn_info);
+void *fc_get_userdata(void *conn_info);
 
 
 /*
-    fog_get_connect_uploadspeed: 获得一个连接的上传速度。
+    fc_get_uploadspeed: 获得一个连接的上传速度。
     conn_info: 为连接后的连接对象。
 */
-float fog_get_connect_uploadspeed(void *conn_info);
+float fc_get_uploadspeed(void *conn_info);
 
 
 /*
-    fog_get_connect_uploadspeed: 获得一个连接的下载速度。
+    fc_get_downloadspeed: 获得一个连接的下载速度。
     conn_info: 为连接后的连接对象。
 */
-float fog_get_connect_downloadspeed(void *conn_info);
+float fc_get_downloadspeed(void *conn_info);
 
 
 /*
-    fog_get_connect_socket: 获得一个连接的socket.
+    fc_get_socket_fd: 获得一个连接的socket.
     conn_info: 为连接后的连接对象。
 */
-int   fog_get_connect_socket(void *conn_info);
+int   fc_get_socket_fd(void *conn_info);
 
 
 /*
-    fog_get_connect_local_addr: 获得与peer连接后本地的IP：PORT。
+    fc_get_local_addr: 获得与peer连接后本地的IP：PORT。
     conn_info: 为连接后的连接对象。
 */
-struct sockaddr_in *fog_get_connect_local_addr(void *connect_info);
+struct sockaddr_in *fc_get_local_addr(void *connect_info);
 
 
 /*
-    fog_get_connect_remote_addr: 获得与peer通信的IP：PORT。
+    fc_get_remote_addr: 获得与peer通信的IP：PORT。
     conn_info: 为连接后的连接对象。
 */
-struct sockaddr_in *fog_get_connect_remote_addr(void *conn_info);
+struct sockaddr_in *fc_get_remote_addr(void *conn_info);
 
 
 /*
-    fog_connect_set_separate: 设置此表示后，连接断开时套接字不会被关闭。
+    fc_set_separate: 设置此表示后，连接断开时套接字不会被关闭。
     conn_info: 为连接后的连接对象。
 */
-void fog_connect_set_separate(void *connect_info);
+void fc_set_separate(void *connect_info);
 
 
 /*
-    fog_connect_disconnect: 断开一个连接。
+    fc_disconnect: 断开一个连接。
     conn_info: 为连接后的连接对象。
 */
-void fog_connect_disconnect(void *conn_info);
+void fc_disconnect(void *conn_info);
 
 
 /*
 */
-void fog_connect_lock(void *conn_info);
+void fc_lock(void *conn_info);
 
 
 /*
 */
-void fog_connect_unlock(void *conn_info);
+void fc_unlock(void *conn_info);
 
 
 /*
 */
-void* fog_malloc(int size);
+void* fc_malloc(int size);
 
 
 /*
 */
-void fog_free(void* buf);
+void fc_free(void* buf);
 
 
 /*
     给节点设一个id.
 */
-void fog_fog_set_id(const char *id);
+void fc_set_id(const char *id);
 #endif

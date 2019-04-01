@@ -47,7 +47,7 @@ make
 ```
 
 ## 性能测试
-平均P2P建立连接时间：1.2秒
+平均P2P建立连接时间：1.2~2秒
 
 ### 系统环境
 Ubuntu 16.04.3 LTS \
@@ -69,8 +69,8 @@ void on_recv(void *arg) {
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
-        fog_send_data(ud->pr_connect, msg, len);
-        fog_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
+        fc_send_data(ud->pr_connect, msg, len);
+        fc_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
         printf("sending: %s\n", msg);
         free(msg);
     }
@@ -96,7 +96,7 @@ int main() {
 void on_connect(void *arg) {
     fog_connection_info *ud = (fog_connection_info *)arg;
     char *msg = strdup("hello\r\n");
-    fog_send_data(ud->pr_connect, msg, strlen(msg));
+    fc_send_data(ud->pr_connect, msg, strlen(msg));
     printf("sending: %s\n", msg);
     free(msg);
 }
@@ -108,7 +108,7 @@ void on_recv(void *arg) {
     if (msg != NULL) {
         printf("receiving: %s\n", msg);
         free(msg);
-        fog_connect_disconnect(ud->pr_connect);
+        fc_disconnect(ud->pr_connect);
     }
 }
 
@@ -130,4 +130,3 @@ int main() {
     - 知名数据恢复软件AnyDataRecovery Pro作者、反汇编与破解专家（同时也是不知名的健身教练）
 
 - 陈柳州(66@pear.hk)
-    

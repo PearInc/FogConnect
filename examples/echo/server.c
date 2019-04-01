@@ -17,8 +17,8 @@ void on_recv(void *arg) {
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
-        fog_send_data(ud->pr_connect, msg, len);
-        fog_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
+        fc_send_data(ud->pr_connect, msg, len);
+        fc_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
         printf("sending: %s\n", msg);
         free(msg);
     }

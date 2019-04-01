@@ -13,7 +13,7 @@
 void on_connect(void *arg) {
     fog_connection_info *ud = (fog_connection_info *)arg;
     char *msg = strdup("hello\r\n");
-    fog_send_data(ud->pr_connect, msg, strlen(msg));
+    fc_send_data(ud->pr_connect, msg, strlen(msg));
     printf("sending: %s\n", msg);
     free(msg);
 }
@@ -25,7 +25,7 @@ void on_recv(void *arg) {
     if (msg != NULL) {
         printf("receiving: %s\n", msg);
         free(msg);
-        fog_connect_disconnect(ud->pr_connect);
+        fc_disconnect(ud->pr_connect);
     }
 }
 

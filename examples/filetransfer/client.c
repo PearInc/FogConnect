@@ -37,7 +37,7 @@ void on_connect(void *arg) {
     printf("connection_cb\n");
     char *msg = strdup("hello\r\n");
     fog_connection_info *ud = (fog_connection_info *)arg;
-    fog_send_data(ud->pr_connect, msg, strlen(msg));
+    fc_send_data(ud->pr_connect, msg, strlen(msg));
     free(msg);
     struct file_data *f = file_data_new();
     ud->context = (void *)f;
