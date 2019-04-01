@@ -1,6 +1,6 @@
 
-#ifndef PR_FOG_CONNECT_H
-#define PR_FOG_CONNECT_H
+#ifndef PR_fc_CONNECT_H
+#define PR_fc_CONNECT_H
 
 #include <stdio.h>
 #include <sys/socket.h>
@@ -49,19 +49,19 @@ typedef struct {
 
     void* context;
     struct evbuffer* buff;
-} fog_connection_info;
+} fc_info;
 
-void fog_set_callbacks(fog_connection_info* ud, connect_cb on_connect, receive_cb on_recv, close_cb on_close);
+void fc_set_callbacks(fc_info* ud, connect_cb on_connect, receive_cb on_recv, close_cb on_close);
 
 //------------------------------------------------------
-void fog_setup(const char* server_id);
+void fc_setup(const char* server_id);
 
-void fog_service_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close);
+void fc_service_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close);
 
-void fog_exit();
+void fc_exit();
 
 // for the client part
 
-int fog_connect_peer(const char* id, int protocol, connect_cb on_connect, receive_cb on_recv, close_cb on_close);
+int fc_connect_peer(const char* id, int protocol, connect_cb on_connect, receive_cb on_recv, close_cb on_close);
 
-#endif // !PR_FOG_CONNECT_H
+#endif // !PR_fc_CONNECT_H

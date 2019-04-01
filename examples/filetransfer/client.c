@@ -36,7 +36,7 @@ struct file_data *file_data_new() {
 void on_connect(void *arg) {
     printf("connection_cb\n");
     char *msg = strdup("hello\r\n");
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
     fc_send_data(ud->pr_connect, msg, strlen(msg));
     free(msg);
     struct file_data *f = file_data_new();
@@ -45,7 +45,7 @@ void on_connect(void *arg) {
 }
 
 void on_close(void *arg) {
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
     struct file_data *f = (struct file_data *)ud->context;
     fclose(f->fp);
     bytes_read = f->length;
@@ -56,7 +56,7 @@ void on_close(void *arg) {
 
 
 void on_recv(void *arg) {
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
     struct file_data *f = (struct file_data *)ud->context;
     if (f->size == -1) {
         // get the file size
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
     }
     g_file = argv[1];
 
-    fog_setup("1e:34:a1:44:2c:2c");
-    fog_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_recv,
+    fc_setup("1e:34:a1:44:2c:2c");
+    fc_connect_peer("1e:34:a1:44:2c:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_recv,
                      on_close);
 
     pthread_mutex_init(&mutex, NULL);
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     printf("seconds: %f\n", seconds);
     double speed = (double)bytes_read / (1024 * 1024 * seconds);
     printf("\nthe speed is %f MB/s\n", speed);
-    fog_exit();
+    fc_exit();
     return 0;
 }
 

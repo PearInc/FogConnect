@@ -5,18 +5,18 @@
 
 #include "fog_connect.h"
 
-static void fog_on_event(void *pr_connect, short events, void *arg);
+static void fc_on_event(void *pr_connect, short events, void *arg);
 
 static void fc_signal_server_init();
 
-static void fog_usr_data_free(void *arg);
+static void fc_usr_data_free(void *arg);
 
 static void *ctx = NULL;
 
 
-static void fog_on_recv(void *pr_connect, void *arg, void *buf, int size) {
+static void fc_on_recv(void *pr_connect, void *arg, void *buf, int size) {
     if (size <= 0) return;
-    fog_connection_info *user_data = (fog_connection_info *)arg;
+    fc_info *user_data = (fc_info *)arg;
     evbuffer_add(user_data->buff, (char *)buf, size);
     if (user_data->on_recv != NULL) {
         user_data->on_recv(user_data);
@@ -24,18 +24,18 @@ static void fog_on_recv(void *pr_connect, void *arg, void *buf, int size) {
 }
 
 
-static void fog_on_close(void *connect, void *arg) {
-    fog_connection_info *ud = (fog_connection_info *)arg;
+static void fc_on_close(void *connect, void *arg) {
+    fc_info *ud = (fc_info *)arg;
     if (ud->on_close != NULL) {
         ud->on_close(ud);
     }
-    fog_usr_data_free(ud);
+    fc_usr_data_free(ud);
 }
 
 
-static fog_connection_info *fog_usr_data_new(connect_cb on_connect, receive_cb on_recv,
+static fc_info *fc_usr_data_new(connect_cb on_connect, receive_cb on_recv,
                                              close_cb on_close) {
-    fog_connection_info *ret = (fog_connection_info *)malloc(sizeof(fog_connection_info));
+    fc_info *ret = (fc_info *)malloc(sizeof(fc_info));
 
     ret->pr_connect = NULL;
     ret->buff = evbuffer_new();
@@ -46,21 +46,21 @@ static fog_connection_info *fog_usr_data_new(connect_cb on_connect, receive_cb o
 }
 
 
-void fog_set_callbacks(fog_connection_info *ud, connect_cb on_connect, receive_cb on_recv,
+void fc_set_callbacks(fc_info *ud, connect_cb on_connect, receive_cb on_recv,
                        close_cb on_close) {
     ud->on_close = on_close;
     ud->on_connect = on_connect;
     ud->on_recv = on_recv;
 }
 
-static void fog_usr_data_free(void *arg) {
+static void fc_usr_data_free(void *arg) {
     if (arg == NULL) return;
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
     evbuffer_free(ud->buff);
     free(ud);
 }
 
-void fog_exit() {
+void fc_exit() {
     if (ctx != NULL) fc_release(ctx);
 }
 
@@ -85,20 +85,20 @@ static receive_cb g_on_recv = NULL;
 static close_cb g_on_close = NULL;
 
 
-static void fog_on_event(void *pr_connect, short events, void *arg) {
-    fog_connection_info *ud = (fog_connection_info *)arg;
+static void fc_on_event(void *pr_connect, short events, void *arg) {
+    fc_info *ud = (fc_info *)arg;
     switch (events) {
     case FOG_EVENT_CONNECTED: {
         if (ud != NULL) {
             ud->pr_connect = pr_connect;
         } else if (fc_is_passive(pr_connect)) {
             // this fog node is connected by other fog node
-            ud = fog_usr_data_new(g_on_connect, g_on_recv, g_on_close);
+            ud = fc_usr_data_new(g_on_connect, g_on_recv, g_on_close);
             fc_set_userdata(pr_connect, ud);
             ud->pr_connect = pr_connect;
         }
         // set the call back, for handle the msg between the fog nodes
-        fc_event_setcb(pr_connect, fog_on_recv, fog_on_close);
+        fc_event_setcb(pr_connect, fc_on_recv, fc_on_close);
 
         // connect callback
         if (ud->on_connect != NULL) {
@@ -117,23 +117,23 @@ static void fog_on_event(void *pr_connect, short events, void *arg) {
 }
 
 
-void fog_setup(const char *server_id) {
+void fc_setup(const char *server_id) {
     ctx = fc_init();
     fc_set_id(server_id);
-    fc_passive_link_setcb(ctx, fog_on_event);
+    fc_passive_link_setcb(ctx, fc_on_event);
     fc_signal_server_init();
 }
 
 
-void fog_service_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close) {
+void fc_service_set_callback(connect_cb on_connect, receive_cb on_recv, close_cb on_close) {
     g_on_connect = on_connect;
     g_on_recv = on_recv;
     g_on_close = on_close;
 }
 
 
-int fog_connect_peer(const char *id, int protocol, connect_cb on_connect, receive_cb on_recv,
+int fc_connect_peer(const char *id, int protocol, connect_cb on_connect, receive_cb on_recv,
                      close_cb on_close) {
-    fog_connection_info *ud = fog_usr_data_new(on_connect, on_recv, on_close);
-    return fc_connect(ctx, id, protocol, 1, fog_on_event, ud);
+    fc_info *ud = fc_usr_data_new(on_connect, on_recv, on_close);
+    return fc_connect(ctx, id, protocol, 1, fc_on_event, ud);
 }

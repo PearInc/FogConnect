@@ -18,7 +18,7 @@ struct pr_user_data
     void*  usr_data;
 };
 
-void fog_connect_callback(void* pr_conn, short events, void* cb_arg) {
+void fc_connect_callback(void* pr_conn, short events, void* cb_arg) {
     struct sockaddr_in  *tmp_remote;
     struct sockaddr_in  *tmp_local;
     struct pr_user_data* arg = (cb_arg);
@@ -73,7 +73,7 @@ void pr_set_signal_info(struct fc_signal_server* signal_info)
 #include <sys/ioctl.h>
 #endif
 char g_mac_buf[32] = {0,};
-int  fog_get_mac(char* mac_address) {
+int  fc_get_mac(char* mac_address) {
     char buf[1024];
     int success = 0;
 	memset(buf, 0, 1024);
@@ -131,11 +131,11 @@ int main(int argc, char *argv[]) {
 
     //测试时，设置的ID，这么为MAC地址。
     //fc_set_id("ee:34:a1:44:1c:1c");
-    fog_get_mac(g_mac_buf);
+    fc_get_mac(g_mac_buf);
     fc_set_id(g_mac_buf);
 
     //设置被动时的回调函数。
-    fc_passive_link_setcb(ctx, fog_connect_callback);
+    fc_passive_link_setcb(ctx, fc_connect_callback);
     //以下以连接信令服务器的操作。
     struct fc_signal_server* signal_info = malloc(sizeof(struct fc_signal_server));
     signal_info->ctx  = ctx;
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
         //UDP protocol
         void* user_data = fc_malloc(sizeof(struct pr_user_data));
         int pr_udp = fc_connect(ctx, argv[1], FOG_TRANSPORT_PROTOCOL_UDP,
-                               0, fog_connect_callback, user_data);
+                               0, fc_connect_callback, user_data);
     }
 
     printf("Please press any key to exit... \n");

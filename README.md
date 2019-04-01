@@ -65,7 +65,7 @@ void on_connect(void *arg) {
 }
 
 void on_recv(void *arg) {
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
@@ -80,10 +80,10 @@ void on_close(void *arg) {
 }
 
 int main() {
-    fog_setup("**:**:**:**:**:1c");
-    fog_service_set_callback(on_connect, on_recv, on_close);
+    fc_setup("**:**:**:**:**:1c");
+    fc_service_set_callback(on_connect, on_recv, on_close);
     getchar();
-    fog_exit();
+    fc_exit();
     return 0;
 }
 
@@ -94,7 +94,7 @@ int main() {
 #include "fog_connect.h"
 
 void on_connect(void *arg) {
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
     char *msg = strdup("hello\r\n");
     fc_send_data(ud->pr_connect, msg, strlen(msg));
     printf("sending: %s\n", msg);
@@ -102,7 +102,7 @@ void on_connect(void *arg) {
 }
 
 void on_recv(void *arg) {
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
     size_t len = 0;
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
@@ -116,10 +116,10 @@ void on_close(void *arg) {
 }
 
 int main() {
-    fog_setup("**:**:**:**:**:2c");
-    fog_connect_peer("**:**:**:**:**:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_recv, on_close);
+    fc_setup("**:**:**:**:**:2c");
+    fc_connect_peer("**:**:**:**:**:1c", FOG_TRANSPORT_PROTOCOL_KCP, on_connect, on_recv, on_close);
     getchar();
-    fog_exit();
+    fc_exit();
     return 0;
 }
 

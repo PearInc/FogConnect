@@ -14,12 +14,12 @@ const char *g_file = NULL;
 
 void on_connect(void *arg) {
     printf("conn_cb\n");
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
 }
 
 void on_recv(void *arg) {
     printf("msg_cb and send the file %s\n", g_file);
-    fog_connection_info *ud = (fog_connection_info *)arg;
+    fc_info *ud = (fc_info *)arg;
 
     FILE *fp;
     char buf[8 * 1024];
@@ -46,10 +46,10 @@ void on_close(void *arg) {
 int main(int argc, char *argv[]) {
     if (argc > 1) {
         g_file = argv[1];
-        fog_setup("1e:34:a1:44:2c:1c");
-        fog_service_set_callback(on_connect, on_recv, on_close);
+        fc_setup("1e:34:a1:44:2c:1c");
+        fc_service_set_callback(on_connect, on_recv, on_close);
         getchar();
-        fog_exit();
+        fc_exit();
     } else {
         printf("arg is too less");
     }
