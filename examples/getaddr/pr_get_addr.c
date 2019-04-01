@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     //设置被动时的回调函数。
     fc_passive_link_setcb(ctx, fc_connect_callback);
     //以下以连接信令服务器的操作。
-    struct fc_signal_server* signal_info = malloc(sizeof(struct fc_signal_server));
+    struct fc_signal_server* signal_info = fc_malloc(sizeof(struct fc_signal_server));
     signal_info->ctx  = ctx;
     pr_set_signal_info(signal_info);
     fc_signal_init(signal_info);

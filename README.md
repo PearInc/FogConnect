@@ -72,7 +72,7 @@ void on_recv(void *arg) {
         fc_send_data(ud->pr_connect, msg, len);
         fc_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
         printf("sending: %s\n", msg);
-        free(msg);
+        fc_free(msg);
     }
 }
 
@@ -98,7 +98,7 @@ void on_connect(void *arg) {
     char *msg = strdup("hello\r\n");
     fc_send_data(ud->pr_connect, msg, strlen(msg));
     printf("sending: %s\n", msg);
-    free(msg);
+    fc_free(msg);
 }
 
 void on_recv(void *arg) {
@@ -107,7 +107,7 @@ void on_recv(void *arg) {
     char *msg = evbuffer_readln(ud->buff, &len, EVBUFFER_EOL_CRLF);
     if (msg != NULL) {
         printf("receiving: %s\n", msg);
-        free(msg);
+        fc_free(msg);
         fc_disconnect(ud->pr_connect);
     }
 }

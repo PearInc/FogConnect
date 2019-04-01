@@ -20,7 +20,7 @@ void on_recv(void *arg) {
         fc_send_data(ud->pr_connect, msg, len);
         fc_send_data(ud->pr_connect, CRLF, sizeof(CRLF));
         printf("sending: %s\n", msg);
-        free(msg);
+        fc_free(msg);
     }
 }
 

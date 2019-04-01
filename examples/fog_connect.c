@@ -35,7 +35,7 @@ static void fc_on_close(void *connect, void *arg) {
 
 static fc_info *fc_usr_data_new(connect_cb on_connect, receive_cb on_recv,
                                              close_cb on_close) {
-    fc_info *ret = (fc_info *)malloc(sizeof(fc_info));
+    fc_info *ret = (fc_info *)fc_malloc(sizeof(fc_info));
 
     ret->pr_connect = NULL;
     ret->buff = evbuffer_new();
@@ -57,7 +57,7 @@ static void fc_usr_data_free(void *arg) {
     if (arg == NULL) return;
     fc_info *ud = (fc_info *)arg;
     evbuffer_free(ud->buff);
-    free(ud);
+    fc_free(ud);
 }
 
 void fc_exit() {
@@ -66,7 +66,7 @@ void fc_exit() {
 
 
 static void fc_signal_server_init() {
-    fc_signal_server *signal_info = (fc_signal_server *)malloc(sizeof(fc_signal_server));
+    fc_signal_server *signal_info = (fc_signal_server *)fc_malloc(sizeof(fc_signal_server));
 
     signal_info->ctx = ctx;
     signal_info->url = SIGNAL_SERVER_URL;

@@ -24,7 +24,7 @@ struct file_data {
 };
 
 struct file_data *file_data_new() {
-    struct file_data *f = (struct file_data *)malloc(sizeof(struct file_data));
+    struct file_data *f = (struct file_data *)fc_malloc(sizeof(struct file_data));
     f->size = -1;
     f->length = 0;
     f->fp = fopen(g_file, "w");
@@ -38,7 +38,7 @@ void on_connect(void *arg) {
     char *msg = strdup("hello\r\n");
     fc_info *ud = (fc_info *)arg;
     fc_send_data(ud->pr_connect, msg, strlen(msg));
-    free(msg);
+    fc_free(msg);
     struct file_data *f = file_data_new();
     ud->context = (void *)f;
     start = time(NULL);
@@ -49,7 +49,7 @@ void on_close(void *arg) {
     struct file_data *f = (struct file_data *)ud->context;
     fclose(f->fp);
     bytes_read = f->length;
-    free(f);
+    fc_free(f);
     end = time(NULL);
     pthread_mutex_unlock(&mutex);
 }
@@ -70,10 +70,10 @@ void on_recv(void *arg) {
         f->length += length;
         // printf("get the file %ld of total %ld\n", f->length, f->size);
 
-        char *msg = (char *)malloc(length);
+        char *msg = (char *)fc_malloc(length);
         evbuffer_remove(ud->buff, msg, length);
         int r = fwrite(msg, length, 1, f->fp);
-        free(msg);
+        fc_free(msg);
         if (r != 1) {
             printf("file write error\n");
             on_close(arg);
