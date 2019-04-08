@@ -168,7 +168,7 @@ struct sockaddr_in *fc_get_remote_addr(void *conn_info);
 
 
 /*
-    fc_set_separate: 设置此表示后，连接断开时套接字不会被关闭。
+    fc_set_separate: 设置后,调用fc_disconnect时套接字不会被关闭。
     conn_info: 为连接后的连接对象。
 */
 void fc_set_separate(void *connect_info);

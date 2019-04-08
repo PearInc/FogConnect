@@ -34,5 +34,3 @@ int main() {
     fc_exit();
     return 0;
 }
-
-
