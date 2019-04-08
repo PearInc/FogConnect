@@ -49,7 +49,7 @@ void fc_connect_callback(void *pr_conn, short events, void *cb_arg) {
             arg->socket(本次连接的套接字),
             arg->local_addr(本次连接的local ip:port),
             arg->remote_addr(本次连接的remote ip:port),
-            可以在程序中任意使用，协议为UDP.
+            可以在程序中任意使用，传输协议为UDP.
         */
         
         /*
