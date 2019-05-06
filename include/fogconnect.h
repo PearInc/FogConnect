@@ -17,18 +17,19 @@ typedef enum fc_transport_protocol {
 #define FOG_EVENT_CONNECTED	    0x80	/**< connect operation finished. */
 #define FOG_EVENT_DISCONNECT	0x100	/**< peer disconnect. */
 
+typedef int   fc_signal_read_cb(void *data);
 typedef void  fc_connect_cb(void *conn_info, unsigned short events, void *cb_arg);
 typedef void  fc_recv_cb(void *conn_info, void *cb_arg, void *buf, int size);
 typedef void  fc_close_cb(void *conn_info, void *cb_arg);
 
-struct fc_ctx;   //struct fc_ctx
+struct fc_ctx;
 
 typedef struct fc_signal_server {
     unsigned short  port;           /**< 服务器监听端口号。*/
     char *url;                      /**< 服务器域名或IP。 */
     char *path;                     /**< ‘/ws’或‘/wss’. */
     const char *certificate;        /**< 证书路径。（可选）。*/
-    const char *privatekey;         /**< 私钥文件路径。（可选）。 */
+    const char *privatekey;         /**< 私钥文件路径。（可选）。*/
     struct fc_ctx  *ctx;
 } fc_signal_server;
 
@@ -37,6 +38,25 @@ typedef struct fc_signal_server {
     参数请具体看struct fc_signal_server.
 */
 int    fc_signal_init(struct fc_signal_server *info);
+
+
+/*
+    fc_signal_setcb: 设置接受信令服务信息回调函数。
+    ctx: fc_init的返回值。
+    callback: 信令服务器返回信息的处理过程。 
+
+    注：当回调函数完成处理后，返回非零值，fogconnect引擎将会继续处理（一般不是感兴趣的信息请返回非零值，反之）。
+*/
+void fc_signal_setcb(struct fc_ctx *ctx, fc_signal_read_cb *callback);
+
+
+/*
+    fc_signal_write_data: 向信令服务器发送数据（json格式）。
+    ctx: fc_init的返回值。
+    buf: 待传输的缓存。
+    size: 缓存数据大小。
+*/
+int fc_signal_write_data(struct fc_ctx *ctx, const char *buf, int size);
 
 
 /*
@@ -70,7 +90,7 @@ void  fc_passive_link_setcb(struct fc_ctx *ctx, fc_connect_cb *callback);
     use_service: 主动连接端，过通这个参数通知用户层处理的具体服务（主要是被连接端能执行指定的服务过程，默认为0）。
     conn_callback: 当P2P连接后，内部就会调用用户层回调函数来处理。
     cb_arg: 用户层私有数据。
-    注：在回调函数被调用时需要保存相关的信息。具体看fc_send_data，fc_event_setcb函数需要使用的参数。
+    注：在回调函数被调用时需要保存相关的信息。具体看fc_send，fc_event_setcb函数需要使用的参数。
 */
 int  fc_connect(struct fc_ctx *ctx, const char *by_id, fc_transport_protocol protocol,
                  int use_service, fc_connect_cb *conn_callback, void *cb_arg);
@@ -168,7 +188,7 @@ struct sockaddr_in *fc_get_remote_addr(void *conn_info);
 
 
 /*
-    fc_set_separate: 设置后,调用fc_disconnect时套接字不会被关闭。
+    fc_set_separate: 设置后表示，连接断开时套接字不会被关闭。
     conn_info: 为连接后的连接对象。
 */
 void fc_set_separate(void *connect_info);
@@ -198,7 +218,7 @@ void* fc_malloc(int size);
 
 /*
 */
-void fc_free(void* buf);
+void fc_free(void *buf);
 
 
 /*
