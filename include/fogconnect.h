@@ -37,7 +37,7 @@ typedef struct fc_signal_server {
     fc_signal_init: 链接信令服务器，返回0表示成功链接，1表示超时。
     参数请具体看struct fc_signal_server.
 */
-int    fc_signal_init(struct fc_signal_server *info);
+int fc_signal_init(struct fc_signal_server *info);
 
 
 /*
