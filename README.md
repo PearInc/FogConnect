@@ -38,7 +38,7 @@ sudo apt-get install git make
 Install dependencies:
 
 ``` shell
-sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev libevent-dev
+sudo apt-get install openssl libssl-dev libwebsockets-dev libjansson-dev libevent-dev libglib2.0-dev
 ```
 
 ##### Build and run examples
