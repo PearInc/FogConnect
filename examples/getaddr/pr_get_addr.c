@@ -55,6 +55,14 @@ void fc_connect_callback(void *pr_conn, short events, void *cb_arg) {
         /*
             如想在其它地方，使用本次连接信息来通信，这不需要释放和关闭套接字。
         */
+
+#if 1
+            printf( "connect info: %s:%d ------->",
+            inet_ntoa(arg->local_addr.sin_addr), htons(arg->local_addr.sin_port));
+            printf("%s:%d\n",inet_ntoa(arg->remote_addr.sin_addr), htons(arg->remote_addr.sin_port));
+            if (arg) fc_free(arg);
+#endif
+
         if (arg) fc_free(arg);
         if (arg->socket != -1) close(arg->socket);
         break;
@@ -142,6 +150,7 @@ int  fc_get_mac(char *mac_address) {
     return 0;
 }
 
+//传入peer mac地址
 int main(int argc, char *argv[]) {
     //初始化fogconnect组件。
     void *ctx = fc_init();
