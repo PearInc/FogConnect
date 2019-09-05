@@ -11,7 +11,7 @@ LDFLAGS := -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations
 CFLAGS += -g -O0 -fdata-sections -ffunction-sections -fno-stack-protector -std=gnu99 \
 	-fPIC -rdynamic -I../include -I./ -DINET -DINET6
 
-LIBS :=  -L../dist/x86/linux/64/  -lfogconnect  -lwebsockets -levent -ljansson -lpthread
+LIBS :=  -L../dist/x86/linux/64/  -lfogconnect  -lwebsockets -levent -ljansson -lglib-2.0 -lpthread
 
 
 filetransfer_server_SRCS = ./fog_connect.c  ./filetransfer/server.c ./filetransfer/ser.c
