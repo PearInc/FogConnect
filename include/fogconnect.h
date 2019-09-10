@@ -18,7 +18,7 @@ typedef enum fc_transport_protocol {
 #define FOG_EVENT_DISCONNECT	0x100	/**< peer disconnect. */
 
 typedef int   fc_signal_read_cb(void *data);
-typedef void  fc_connect_cb(void *conn_info, unsigned short events, void *cb_arg);
+typedef void  fc_connect_cb(void *conn_info, short events, void *cb_arg);
 typedef void  fc_recv_cb(void *conn_info, void *cb_arg, void *buf, int size);
 typedef void  fc_close_cb(void *conn_info, void *cb_arg);
 
@@ -185,6 +185,13 @@ struct sockaddr_in *fc_get_local_addr(void *connect_info);
     conn_info: 为连接后的连接对象。
 */
 struct sockaddr_in *fc_get_remote_addr(void *conn_info);
+
+
+/*
+    fc_get_peer_mac: 获得与peer通信的mac信息。
+    conn_info: 为连接后的连接对象。
+*/
+int fc_get_peer_mac(void *conn_info, char* out_buf, int len);
 
 
 /*
