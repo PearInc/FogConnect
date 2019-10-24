@@ -12,7 +12,7 @@
 
 #include "fogconnect.h"
 
-#define SIGNAL_SERVER_URL "47.52.153.245"
+#define SIGNAL_SERVER_URL "122.152.200.206"
 
 /**
  * 
