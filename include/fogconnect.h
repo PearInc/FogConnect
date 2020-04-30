@@ -17,8 +17,8 @@ typedef enum fc_transport_protocol {
 #define FOG_EVENT_CONNECTED	    0x80	/**< connect operation finished. */
 #define FOG_EVENT_DISCONNECT	0x100	/**< peer disconnect. */
 
-typedef int   fc_signal_read_cb(void *data);
-typedef void  fc_connect_cb(void *conn_info, short events, void *cb_arg);
+typedef int   fc_signal_read_cb(void *ctx, void *data);
+typedef void  fc_connect_cb(void *conn_info, unsigned short events, void *cb_arg);
 typedef void  fc_recv_cb(void *conn_info, void *cb_arg, void *buf, int size);
 typedef void  fc_close_cb(void *conn_info, void *cb_arg);
 
@@ -103,7 +103,7 @@ int  fc_connect(struct fc_ctx *ctx, const char *by_id, fc_transport_protocol pro
     recv：传输层受到数据后，调用应用层的数据处理函数（被动调用）。
     close:当连接断开，或超时将调用（被动调用）。
 */
-int  fc_event_setcb(struct fc_connect_ctx *conn_info, fc_recv_cb *recv, fc_close_cb *close);
+int  fc_event_setcb(void *conn_info, fc_recv_cb *recv, fc_close_cb *close);
 
 
 /*
@@ -112,7 +112,7 @@ int  fc_event_setcb(struct fc_connect_ctx *conn_info, fc_recv_cb *recv, fc_close
     buf: 待传输的缓存。
     size: 缓存数据大小。
 */
-int  fc_send(struct fc_connect_ctx *conn_info, void *buf, int size);
+int  fc_send(void *conn_info, void *buf, int size);
 
 
 /*
@@ -120,7 +120,7 @@ int  fc_send(struct fc_connect_ctx *conn_info, void *buf, int size);
     conn_info: 为连接后的连接对象。
     返回值：     0表示主动发起链接，1表示被动被连接。
 */
-int fc_is_passive(struct fc_connect_ctx *conn_info);
+int fc_is_passive(void *conn_info);
 
 
 /*
@@ -135,7 +135,7 @@ int fc_is_passive(struct fc_connect_ctx *conn_info);
                      |-------->8位(4~11)表示应用层自定定义的约定。
     |----------->(12~31)未定义。
 */
-unsigned int  fc_get_convention_number(struct fc_connect_ctx *conn_info);
+unsigned int  fc_get_convention_number(void *conn_info);
 
 
 /*
@@ -143,86 +143,86 @@ unsigned int  fc_get_convention_number(struct fc_connect_ctx *conn_info);
     conn_info: 为连接后的连接对象。
     user_data: 用户私有数据指针。
 */
-void fc_set_userdata(struct fc_connect_ctx *conn_info, void *user_data);
+void fc_set_userdata(void *conn_info, void *user_data);
 
 
 /*
     fc_get_userdata: 获得连接后的用户私有数据。
     conn_info: 为连接后的连接对象。
 */
-void *fc_get_userdata(struct fc_connect_ctx *conn_info);
+void *fc_get_userdata(void *conn_info);
 
 
 /*
     fc_get_uploadspeed: 获得一个连接的上传速度。
     conn_info: 为连接后的连接对象。
 */
-float fc_get_uploadspeed(struct fc_connect_ctx *conn_info);
+float fc_get_uploadspeed(void *conn_info);
 
 
 /*
     fc_get_downloadspeed: 获得一个连接的下载速度。
     conn_info: 为连接后的连接对象。
 */
-float fc_get_downloadspeed(struct fc_connect_ctx *conn_info);
+float fc_get_downloadspeed(void *conn_info);
 
 
 /*
     fc_get_socket_fd: 获得一个连接的socket.
     conn_info: 为连接后的连接对象。
 */
-int   fc_get_socket_fd(struct fc_connect_ctx *conn_info);
+int   fc_get_socket_fd(void *conn_info);
 
 
 /*
     fc_get_local_addr: 获得与peer连接后本地的IP：PORT。
     conn_info: 为连接后的连接对象。
 */
-struct sockaddr_in *fc_get_local_addr(struct fc_connect_ctx *connect_info);
+struct sockaddr_in *fc_get_local_addr(void *connect_info);
 
 
 /*
     fc_get_remote_addr: 获得与peer通信的IP：PORT。
     conn_info: 为连接后的连接对象。
 */
-struct sockaddr_in *fc_get_remote_addr(struct fc_connect_ctx *conn_info);
+struct sockaddr_in *fc_get_remote_addr(void *conn_info);
 
 
 /*
     fc_get_peer_mac: 获得与peer通信的mac信息。
     conn_info: 为连接后的连接对象。
 */
-int fc_get_peer_mac(struct fc_connect_ctx *conn_info, char* out_buf, int len);
+int fc_get_peer_mac(void *conn_info, char* out_buf, int len);
 
 
 /*
     fc_set_separate: 设置后表示，连接断开时套接字不会被关闭。
     conn_info: 为连接后的连接对象。
 */
-void fc_set_separate(struct fc_connect_ctx *connect_info);
+void fc_set_separate(void *connect_info);
 
 
 /*
     fc_set_separate: 获取连接后的控制。
     conn_info: 为连接后的连接对象。
 */
-fc_transport_protocol fc_get_connect_protocol(struct fc_connect_ctx *connect_info);
+fc_transport_protocol fc_get_connect_protocol(void *connect_info);
 
 /*
     fc_disconnect: 断开一个连接。
     conn_info: 为连接后的连接对象。
 */
-void fc_disconnect(struct fc_connect_ctx *conn_info);
+void fc_disconnect(void *conn_info);
 
 
 /*
 */
-void fc_lock(struct fc_connect_ctx *conn_info);
+void fc_lock(void *conn_info);
 
 
 /*
 */
-void fc_unlock(struct fc_connect_ctx *conn_info);
+void fc_unlock(void *conn_info);
 
 
 /*
