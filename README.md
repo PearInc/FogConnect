@@ -1,4 +1,4 @@
-## 雾连接传输组件（FogConnet）
+## 雾连接传输组件（FogConnect）
 
 FogConnet 是用于P2P网络中连接、调度、传输等功能于一体的组件
 
